@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "998398348087",
+    "project_id": "authfilmboxd",
+    "storage_bucket": "authfilmboxd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:998398348087:android:69f6752bd67c846ecca8b2",
+        "android_client_info": {
+          "package_name": "com.filmboxd.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB69ZUdr6hW5TAQn2dgEyN_CAUEHasWe28"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
