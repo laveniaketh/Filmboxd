@@ -1,6 +1,7 @@
-# filmboxd
+# Filmboxd
 
-A new Flutter project.
+Filmboxd is a social media app designed for people who are into films. It allows users to share reviews, rate movies, and connect with the community by engaging with others who share similar interests. With Filmboxd, users can explore film reviews, share their thoughts on the movies they’ve watched, connect with another film enthusiast, and keep track of their movie-watching journey. 
+
 
 ## Getting Started
 
