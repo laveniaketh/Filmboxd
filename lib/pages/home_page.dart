@@ -6,23 +6,21 @@ HomePage({super.key});
 
 final user = FirebaseAuth.instance.currentUser!;
 
-
 //sign user out method
-
 void signUserOut(){
   FirebaseAuth.instance.signOut();
 }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Scaffold( 
       appBar: AppBar(
         actions: [IconButton(
           onPressed: signUserOut, 
           icon: const Icon(Icons.logout))],
       ),
       body: Center(
-        child: Text("Welcome to the HomePage " + user.email!),
+        child: Text("Welcome to the HomePage ${user.email!}"),
       ),
     );
   }

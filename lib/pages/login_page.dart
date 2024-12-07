@@ -3,11 +3,12 @@ import 'package:flutter/material.dart'; // Import Flutter material package
 import 'package:filmboxd/components/my_textfield.dart'; // Import custom text field component
 import 'package:filmboxd/components/my_button.dart'; // Import custom button component
 import 'package:filmboxd/components/my_button_light.dart'; // Import custom light button component
-import 'signup_page.dart'; // Import sign up page
-import 'home_page.dart'; // Import home page
+// Import sign up page
+// Import home page
 
 class LoginPage extends StatefulWidget {
-  LoginPage({super.key});
+  final Function()? onTap;
+  const LoginPage({super.key, required this.onTap});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -22,12 +23,12 @@ class _LoginPageState extends State<LoginPage> {
   void signUserIn() async {
 
     //show loading circle
-    showDialog(context: context, builder: (context) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-    );
+    // showDialog(context: context, builder: (context) {
+    //   return Center(
+    //     child: CircularProgressIndicator(),
+    //   );
+    // }
+    // );
 
     //sign in
     try {
@@ -35,15 +36,20 @@ class _LoginPageState extends State<LoginPage> {
         email: emailController.text,
         password: passWordController.text,
       );
-    } catch (e) {
-      if (e is FirebaseAuthException && e.code == 'network-request-failed') {
-        print('Network error, retrying...');
-        // Optionally retry or notify the user
+      // Navigator.pop(context);
+    } on FirebaseAuthException catch (e) { 
+      //wrong email
+      if(e.code== 'user-not-found') {
+        //show error
       }
-    }
+      // wrong pw
+      else if (e.code== 'wrong-password') {
+        //show error
+      }
 
-    //remove the loading circle
-    Navigator.pop(context);
+      
+    }
+    
   }
 
   void signUserInWithGoogle() {}
@@ -85,140 +91,136 @@ class _LoginPageState extends State<LoginPage> {
                       topRight: Radius.circular(50),
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 30),
-                      Center(
-                        child: Column(
-                          children: [
-                            // Back in action. We’ve missed your reviews!
-                            const Text(
-                              "Back in action. We’ve missed your reviews!",
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                color: Color(0xFf1F1516),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 30),
+                        Center(
+                          child: Column(
+                            children: [
+                              // Back in action. We’ve missed your reviews!
+                              const Text(
+                                "Back in action. We’ve missed your reviews!",
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  color: Color(0xFf1F1516),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 30),
-                            // Email textfield
-                            MyTextField(
-                              controller: emailController,
-                              hintText: 'Email',
-                              obscureText: false,
-                              imagePath: 'images/email.png',
-                            ),
-                            const SizedBox(height: 15),
-                            // Password textfield
-                            MyTextField(
-                              controller: passWordController,
-                              hintText: 'Password',
-                              obscureText: true,
-                              imagePath: 'images/password.png',
-                            ),
-                            const SizedBox(height: 15),
-                            // Forgot password
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 30),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Text('Forgot Password?',
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        color: Color(0xFF1F1516),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w400,
-                                      )),
-                                ],
+                              const SizedBox(height: 30),
+                              // Email textfield
+                              MyTextField(
+                                controller: emailController,
+                                hintText: 'Email',
+                                obscureText: false,
+                                imagePath: 'images/email.png',
                               ),
-                            ),
-                            const SizedBox(height: 15),
-                            // Sign in button
-                            MyButton(
-                              onTap: () => signUserIn(),
-                              text: 'Sign in',
-                            ),
-                            const SizedBox(height: 15),
-                            // Or continue with
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 25),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Divider(
-                                      color: Color(0xFFF3F0E6),
-                                      thickness: 2,
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 10),
-                                    child: Text(
-                                      'or',
-                                      style: TextStyle(
-                                        fontFamily: 'Poppins',
-                                        color: Color(0xFF1F1516),
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w400,
+                              const SizedBox(height: 15),
+                              // Password textfield
+                              MyTextField(
+                                controller: passWordController,
+                                hintText: 'Password',
+                                obscureText: true,
+                                imagePath: 'images/password.png',
+                              ),
+                              const SizedBox(height: 15),
+                              // Forgot password
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 30),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text('Forgot Password?',
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          color: Color(0xFF1F1516),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              // Sign in button
+                              MyButton(
+                                onTap: () => signUserIn(),
+                                text: 'Sign in',
+                              ),
+                              const SizedBox(height: 15),
+                              // Or continue with
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 25),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Divider(
+                                        color: Color(0xFFF3F0E6),
+                                        thickness: 2,
                                       ),
                                     ),
-                                  ),
-                                  Expanded(
-                                    child: Divider(
-                                      color: Color(0xFFF3F0E6),
-                                      thickness: 2,
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      child: Text(
+                                        'or',
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          color: Color(0xFF1F1516),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                            // Google sign in
-                            MyButtonLight(
-                              onTap: signUserInWithGoogle,
-                              buttonText: 'Sign in with Google',
-                              imagePath: 'images/google.png',
-                            ),
-                            const SizedBox(height: 190),
-                            // Don't have an account? Sign up
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  'Don’t have an account? ',
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    color: Color(0xFF1F1516),
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                                    Expanded(
+                                      child: Divider(
+                                        color: Color(0xFFF3F0E6),
+                                        thickness: 2,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => SignUpPage()),
-                                    );
-                                  },
-                                  child: const Text(
-                                    'Sign up ',
+                              ),
+                              const SizedBox(height: 15),
+                              // Google sign in
+                              MyButtonLight(
+                                onTap: signUserInWithGoogle,
+                                buttonText: 'Sign in with Google',
+                                imagePath: 'images/google.png',
+                              ),
+                              const SizedBox(height: 190),
+                              // Don't have an account? Sign up
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'Don’t have an account? ',
                                     style: TextStyle(
                                       fontFamily: 'Poppins',
                                       color: Color(0xFF1F1516),
                                       fontSize: 13,
-                                      fontWeight: FontWeight.w500,
+                                      fontWeight: FontWeight.w400,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ],
+                                  GestureDetector(
+                                    onTap: widget.onTap,
+                                    child: const Text(
+                                      'Sign up ',
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        color: Color(0xFF1F1516),
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

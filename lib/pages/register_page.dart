@@ -1,23 +1,60 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart'; // Import Flutter material package
 import 'package:filmboxd/components/my_textfield.dart'; // Import custom text field component
 import 'package:filmboxd/components/my_button.dart'; // Import custom button component
 import 'package:filmboxd/components/my_button_light.dart'; // Import custom light button component
-import 'login_page.dart'; // Import login page
 
-class SignUpPage extends StatelessWidget {
-  SignUpPage({super.key});
+class RegisterPage extends StatefulWidget {
+  final Function()? onTap;
+  const RegisterPage({super.key, required this.onTap});
 
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
   // Text editing controllers
   final emailController = TextEditingController();
-  final passWordController = TextEditingController();
 
-  // Sign up user method
-  void signUserUp(BuildContext context) {
-    // Navigate to LoginPage after sign up button is tapped
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-    );
+  final passWordController = TextEditingController();
+  final confirmPassWordController = TextEditingController();
+
+  void signUserUp() async {
+
+    //show loading circle
+    /*
+    showDialog(context: context, builder: (context) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    });
+    */
+
+    //create user
+    try {
+      //check if password is confirmed
+      if (passWordController.text == confirmPassWordController.text) {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: emailController.text,
+        password: passWordController.text,
+      );
+
+      }
+      
+      // Navigator.pop(context);
+    } on FirebaseAuthException catch (e) { 
+      //wrong email
+      if(e.code== 'user-not-found') {
+        //show error
+      }
+      // wrong pw
+      else if (e.code== 'wrong-password') {
+        //show error
+      }
+
+      
+    }
+    
   }
 
   void signUserInWithGoogle() {}
@@ -25,7 +62,8 @@ class SignUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false, // Prevent resizing when the keyboard appears
+      resizeToAvoidBottomInset:
+          false, // Prevent resizing when the keyboard appears
       body: Center(
         child: Container(
           height: double.infinity,
@@ -58,7 +96,8 @@ class SignUpPage extends StatelessWidget {
                       topRight: Radius.circular(50),
                     ),
                   ),
-                  child: Column(
+                  child: SingleChildScrollView(
+                    child: Column (
                     children: [
                       const SizedBox(height: 30),
                       Center(
@@ -93,7 +132,7 @@ class SignUpPage extends StatelessWidget {
                             const SizedBox(height: 15),
                             // Confirm password textfield
                             MyTextField(
-                              controller: passWordController,
+                              controller: confirmPassWordController,
                               hintText: 'Confirm Password',
                               obscureText: true,
                               imagePath: 'images/password.png',
@@ -101,7 +140,7 @@ class SignUpPage extends StatelessWidget {
                             const SizedBox(height: 35),
                             // Sign up button
                             MyButton(
-                              onTap: () => signUserUp(context),
+                              onTap: signUserUp,
                               text: 'Sign up',
                             ),
                             const SizedBox(height: 15),
@@ -159,12 +198,7 @@ class SignUpPage extends StatelessWidget {
                                   ),
                                 ),
                                 GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => LoginPage()),
-                                    );
-                                  },
+                                  onTap: widget.onTap,
                                   child: const Text(
                                     'Sign in ',
                                     style: TextStyle(
@@ -181,6 +215,7 @@ class SignUpPage extends StatelessWidget {
                         ),
                       ),
                     ],
+                    ),
                   ),
                 ),
               )

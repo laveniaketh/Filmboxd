@@ -1,10 +1,7 @@
 
 
 import 'package:filmboxd/pages/auth_page.dart';
-import 'package:filmboxd/pages/signup_page.dart';
-import 'package:filmboxd/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'pages/login_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
