@@ -1,6 +1,11 @@
 
 
 import 'package:filmboxd/pages/auth_page.dart';
+import 'package:filmboxd/pages/edit_profile_page.dart';
+import 'package:filmboxd/pages/home_page.dart';
+import 'package:filmboxd/pages/movie_details_screen.dart';
+import 'package:filmboxd/pages/profile_page.dart';
+import 'package:filmboxd/pages/root_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -28,7 +33,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          home: AuthPage(),
+          home: RootPage(),
         );
       },
     );
