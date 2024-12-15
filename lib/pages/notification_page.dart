@@ -1,3 +1,4 @@
+import 'package:filmboxd/widgets/notification_item_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -64,6 +65,11 @@ class _NotificationPageState extends State<NotificationPage>
               color: Colors.white,
             ),
           ),
+        ),
+        body: ListView(
+          children: [
+            NotificationItemWidget(),
+          ],
         ),
       ),
     );

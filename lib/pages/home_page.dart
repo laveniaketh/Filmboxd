@@ -1,5 +1,6 @@
 import 'package:filmboxd/models/movie_lists_homepage_model.dart';
 import 'package:filmboxd/models/review_model.dart';
+import 'package:filmboxd/widgets/list_post_widget.dart';
 import 'package:filmboxd/widgets/movie_poster_scroll_widget.dart';
 import 'package:filmboxd/widgets/review_post_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -139,6 +140,7 @@ class _HomePageState extends State<HomePage>
                 EdgeInsets.symmetric(horizontal: -30, vertical: 10),
           ),
         ),
+        
         body: TabBarView(
           controller: _tabController,
           children: [
@@ -346,6 +348,9 @@ class _HomePageState extends State<HomePage>
             Center(child: 
             ListView(
               // Lists Tab
+              children: [
+                ListPostWidget(),
+              ],
 
             )
             ),

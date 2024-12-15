@@ -1,3 +1,7 @@
+import 'package:filmboxd/components/searchfield.dart';
+import 'package:filmboxd/widgets/list_post_widget.dart';
+import 'package:filmboxd/widgets/movie_result_item_widget.dart';
+import 'package:filmboxd/widgets/user_result_item_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -10,7 +14,7 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage>
     with SingleTickerProviderStateMixin {
-  final user = FirebaseAuth.instance.currentUser!;
+  User? user;
   late TabController _tabController;
   int _selectedIndex = 0;
 
@@ -23,10 +27,8 @@ class _SearchPageState extends State<SearchPage>
   @override
   void initState() {
     super.initState();
+    user = FirebaseAuth.instance.currentUser;
     _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(() {
-      setState(() {});
-    });
   }
 
   @override
@@ -42,7 +44,7 @@ class _SearchPageState extends State<SearchPage>
     });
   }
 
-//sign user out method
+  // Sign user out method
   void signUserOut() {
     FirebaseAuth.instance.signOut();
   }
@@ -128,58 +130,31 @@ class _SearchPageState extends State<SearchPage>
           controller: _tabController,
           children: [
             Center(
-                child: ListView(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 40, left: 20, right: 20),
-                  decoration: BoxDecoration(boxShadow: [
-                    BoxShadow(
-                        color: const Color(0xff1D1617).withOpacity(0.11),
-                        blurRadius: 40,
-                        spreadRadius: 0.0)
-                  ]),
-                  child: TextField(
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.all(15),
-                        hintText: 'Search Pancake',
-                        hintStyle: const TextStyle(
-                            color: Color(0xffDDDADA), fontSize: 14),
-                        prefixIcon: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Image.asset(
-                              'images/homepage/search-selected.png'),
-                        ),
-                        suffixIcon: SizedBox(
-                          width: 100,
-                          child: IntrinsicHeight(
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  const VerticalDivider(
-                                    color: Colors.black,
-                                    indent: 10,
-                                    endIndent: 10,
-                                    thickness: 0.1,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Image.asset(
-                                        'images/homepage/search-selected.png'),
-                                  ),
-                                ]),
-                          ),
-                        ),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide.none)),
-                  ),
-                ),
-              ],
-            )),
-            Center(child: Text('Users Content')),
-            Center(child: Text('Lists  Content')),
+              child: ListView(
+                children: [
+                  SearchField(),
+                  MovieResultItemWidget(),
+                ],
+              ),
+            ),
+            Center(
+              child: ListView(
+                children: [
+                  SearchField(),
+                  UserResultItemWidget(),
+                  UserResultItemWidget(),
+                  UserResultItemWidget(),
+                ],
+              ),
+            ),
+            Center(
+              child: ListView(
+                children: [
+                  SearchField(),
+                  ListPostWidget(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
