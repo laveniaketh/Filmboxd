@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class EditProfilePage extends StatefulWidget {
-  EditProfilePage({super.key});
+  const EditProfilePage({super.key});
 
   @override
   _EditProfilePageState createState() => _EditProfilePageState();
@@ -13,14 +13,14 @@ class _EditProfilePageState extends State<EditProfilePage>
   final user = FirebaseAuth.instance.currentUser!;
   late TabController _tabController;
   int _selectedIndex = 0;
-  TextEditingController _name = TextEditingController(text: "lavene");
-  TextEditingController _username = TextEditingController(text: "laveniaketh");
-  TextEditingController _bio = TextEditingController(text: "may we find solace in film.");
+  final TextEditingController _name = TextEditingController(text: "lavene");
+  final TextEditingController _username = TextEditingController(text: "laveniaketh");
+  final TextEditingController _bio = TextEditingController(text: "may we find solace in film.");
 
   final List<Color> selectedTabColors = [
     Color(0xfF8DB2B2),
     Color(0xfFF3D72E),
-    Color(0xfffB85D48),
+    Color(0xfffb85d48),
   ];
 
   @override

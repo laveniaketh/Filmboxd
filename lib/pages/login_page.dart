@@ -1,3 +1,5 @@
+import 'package:filmboxd/pages/forgot_pw_page.dart';
+import 'package:filmboxd/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart'; // Import Flutter material package
 import 'package:filmboxd/components/my_textfield.dart'; // Import custom text field component
@@ -31,28 +33,30 @@ class _LoginPageState extends State<LoginPage> {
     // );
 
     //sign in
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passWordController.text,
-      );
-      // Navigator.pop(context);
-    } on FirebaseAuthException catch (e) { 
-      //wrong email
-      if(e.code== 'user-not-found') {
-        //show error
-      }
-      // wrong pw
-      else if (e.code== 'wrong-password') {
-        //show error
-      }
+    // try {
+    //   await FirebaseAuth.instance.signInWithEmailAndPassword(
+    //     email: emailController.text,
+    //     password: passWordController.text,
+    //   );
+    //   // Navigator.pop(context);
+    // } on FirebaseAuthException catch (e) { 
+    //   //wrong email
+    //   if(e.code== 'user-not-found') {
+    //     //show error
+    //   }
+    //   // wrong pw
+    //   else if (e.code== 'wrong-password') {
+    //     //show error
+    //   }
 
       
-    }
+    // }
     
   }
 
-  void signUserInWithGoogle() {}
+  // void signUserInWithGoogle() {
+  //   AuthService().signInWithGoogle();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -126,25 +130,35 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               const SizedBox(height: 15),
                               // Forgot password
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 30),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 30),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    Text('Forgot Password?',
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins',
-                                          color: Color(0xFF1F1516),
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w400,
-                                        )),
+                                    GestureDetector(
+                                      onTap: (){
+                                        Navigator.push(context, MaterialPageRoute(builder: (context){
+                                          return ForgotPasswordPage();
+                                        }));
+                                      },
+                                      child: Text('Forgot Password?',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Color(0xFF1F1516),
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w400,
+                                          )),
+                                    ),
                                   ],
                                 ),
                               ),
                               const SizedBox(height: 15),
                               // Sign in button
                               MyButton(
-                                onTap: () => signUserIn(),
+                                onTap: () => AuthService().signInWithEmailAndPassword(
+                                  emailController.text, 
+                                  passWordController.text,
+                                ),
                                 text: 'Sign in',
                               ),
                               const SizedBox(height: 15),
@@ -184,7 +198,7 @@ class _LoginPageState extends State<LoginPage> {
                               const SizedBox(height: 15),
                               // Google sign in
                               MyButtonLight(
-                                onTap: signUserInWithGoogle,
+                                onTap: () => AuthService().signInWithGoogle(),
                                 buttonText: 'Sign in with Google',
                                 imagePath: 'images/google.png',
                               ),

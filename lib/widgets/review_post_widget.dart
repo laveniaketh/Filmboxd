@@ -5,7 +5,7 @@ import '../services/omdb_service.dart';
 class ReviewPostWidget extends StatelessWidget {
   final ReviewPost review;
 
-  const ReviewPostWidget({required this.review});
+  const ReviewPostWidget({super.key, required this.review});
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +116,7 @@ class ReviewPostWidget extends StatelessWidget {
                       children: [
                         ImageIcon(
                           AssetImage('images/homepage/heart.png'),
-                          color: Color(0xfFFB85D48),
+                          color: Color(0xfffb85d48),
                           size: 24,
                         ),
                         SizedBox(width: 4),
@@ -148,7 +148,7 @@ class ReviewPostWidget extends StatelessWidget {
                           padding:
                               EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Color(0xFFF8DB2B2),
+                            color: Color(0xfff8db2b2),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(

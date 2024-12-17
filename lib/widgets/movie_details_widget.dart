@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MovieDetailsWidget extends StatelessWidget {
   final Map<String, dynamic> movieData;
 
-  const MovieDetailsWidget({required this.movieData, Key? key}) : super(key: key);
+  const MovieDetailsWidget({required this.movieData, super.key});
 
   @override
   Widget build(BuildContext context) {

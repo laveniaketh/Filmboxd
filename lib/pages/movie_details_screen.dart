@@ -3,6 +3,8 @@ import '../services/omdb_service.dart';
 import '../widgets/movie_details_widget.dart';
 
 class MovieDetailsScreen extends StatefulWidget {
+  const MovieDetailsScreen({super.key});
+
   @override
   _MovieDetailsScreenState createState() => _MovieDetailsScreenState();
 }

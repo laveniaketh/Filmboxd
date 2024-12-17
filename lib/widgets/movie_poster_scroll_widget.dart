@@ -6,8 +6,8 @@ class MoviePosterScrollWidget extends StatefulWidget {
 
   const MoviePosterScrollWidget({
     required this.movieTitles,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _MoviePosterScrollWidgetState createState() =>

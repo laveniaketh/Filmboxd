@@ -1,3 +1,4 @@
+import 'package:filmboxd/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart'; // Import Flutter material package
 import 'package:filmboxd/components/my_textfield.dart'; // Import custom text field component
@@ -140,7 +141,9 @@ class _RegisterPageState extends State<RegisterPage> {
                             const SizedBox(height: 35),
                             // Sign up button
                             MyButton(
-                              onTap: signUserUp,
+                              onTap: () => AuthService().signUpWithEmailAndPassword(
+                                emailController.text, 
+                                passWordController.text),
                               text: 'Sign up',
                             ),
                             const SizedBox(height: 15),
@@ -179,7 +182,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             const SizedBox(height: 15),
                             // Google sign up
                             MyButtonLight(
-                              onTap: signUserInWithGoogle,
+                              onTap: AuthService().signInWithGoogle,
                               buttonText: 'Sign up with Google',
                               imagePath: 'images/google.png',
                             ),

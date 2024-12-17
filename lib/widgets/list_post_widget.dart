@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ListPostWidget extends StatelessWidget {
+  const ListPostWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -54,7 +56,7 @@ class ListPostWidget extends StatelessWidget {
                 SizedBox(height: 8),
 
                 // small horizontal scrollable movie posters
-                Container(
+                SizedBox(
                   height: 50,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
@@ -96,7 +98,7 @@ class ListPostWidget extends StatelessWidget {
                       children: [
                         ImageIcon(
                           AssetImage('images/homepage/heart.png'),
-                          color: Color(0xfFFB85D48),
+                          color: Color(0xfffb85d48),
                           size: 24,
                         ),
                         SizedBox(width: 4),

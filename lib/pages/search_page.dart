@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatefulWidget {
-  SearchPage({super.key});
+  const SearchPage({super.key});
 
   @override
   _SearchPageState createState() => _SearchPageState();
@@ -21,7 +21,7 @@ class _SearchPageState extends State<SearchPage>
   final List<Color> selectedTabColors = [
     Color(0xfF8DB2B2),
     Color(0xfFF3D72E),
-    Color(0xfffB85D48),
+    Color(0xfffb85d48),
   ];
 
   @override

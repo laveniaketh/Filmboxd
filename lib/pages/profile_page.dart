@@ -1,13 +1,15 @@
 import 'package:filmboxd/models/review_model.dart';
 import 'package:filmboxd/pages/edit_profile_page.dart';
+import 'package:filmboxd/services/auth_service.dart';
 import 'package:filmboxd/widgets/list_post_widget.dart';
 import 'package:filmboxd/widgets/movie_poster_grid_widget.dart';
 import 'package:filmboxd/widgets/review_post_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:filmboxd/pages/auth_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  ProfilePage({super.key});
+  const ProfilePage({super.key});
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
@@ -17,13 +19,13 @@ class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   final user = FirebaseAuth.instance.currentUser!;
   late TabController _tabController;
-  int _selectedIndex = 0;
+  final int _selectedIndex = 0;
 
   final List<Color> selectedTabColors = [
     Color(0xfF8DB2B2),
     Color(0xfFF3D72E),
-    Color(0xfFFF9F08D),
-    Color(0xfffB85D48),
+    Color(0xffff9f08d),
+    Color(0xfffb85d48),
   ];
 
   final ReviewPost sampleReview = ReviewPost(
@@ -35,7 +37,8 @@ class _ProfilePageState extends State<ProfilePage>
     profileImage:
         "https://path_to_profile_image.com/profile.jpg", // Replace with actual profile image URL
     numberOfLikes: 10,
-    numberOfComments: 3, starRating: 3.0,
+    numberOfComments: 3,
+    starRating: 3.0,
   );
 
   @override
@@ -53,18 +56,6 @@ class _ProfilePageState extends State<ProfilePage>
     super.dispose();
   }
 
-  // Method to handle tab selection
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-//sign user out method
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -73,13 +64,32 @@ class _ProfilePageState extends State<ProfilePage>
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Color(0xfF1F1516),
-          title: Text(
-            'lavene',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+          title: GestureDetector(
+            onTap: () async {
+              // Show the dropdown menu when the title is tapped
+              await showMenu(
+                context: context,
+                position: RelativeRect.fromLTRB(100, 70, 100, 0),
+                items: [
+                  PopupMenuItem<int>(
+                    value: 0,
+                    child: Text('Logout'),
+                  ),
+                ],
+              ).then((value) {
+                if (value == 0) {
+                  AuthService().signOut();
+                }
+              });
+            },
+            child: Text(
+              'lavene',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
           bottom: TabBar(
@@ -134,7 +144,7 @@ class _ProfilePageState extends State<ProfilePage>
               fontFamily: 'Poppins',
               fontSize: 11,
               fontWeight: FontWeight.w600,
-            ), // Style for selected tab
+            ),
             labelColor: Colors.yellow,
             unselectedLabelStyle: TextStyle(
               fontFamily: 'Poppins',
@@ -193,7 +203,7 @@ class _ProfilePageState extends State<ProfilePage>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
+                            SizedBox(
                               width: 100,
                               child: Column(
                                 children: [
@@ -218,7 +228,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 ],
                               ),
                             ),
-                            Container(
+                            SizedBox(
                               width: 100,
                               child: Column(
                                 children: [
@@ -243,7 +253,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 ],
                               ),
                             ),
-                            Container(
+                            SizedBox(
                               width: 100,
                               child: Column(
                                 children: [

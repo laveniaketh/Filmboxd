@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SearchField extends StatefulWidget {
+  const SearchField({super.key});
+
   @override
   _SearchFieldState createState() => _SearchFieldState();
 }

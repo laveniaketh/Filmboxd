@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RootPage extends StatefulWidget {
-  RootPage({super.key});
+  const RootPage({super.key});
 
   @override
   _RootPageState createState() => _RootPageState();
@@ -21,7 +21,7 @@ class _RootPageState extends State<RootPage>
   final List<Color> selectedTabColors = [
     Color(0xfF8DB2B2),
     Color(0xfFF3D72E),
-    Color(0xfffB85D48),
+    Color(0xfffb85d48),
   ];
 
   // Method to handle tab selection

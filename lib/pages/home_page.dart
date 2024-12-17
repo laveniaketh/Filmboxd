@@ -1,5 +1,6 @@
 import 'package:filmboxd/models/movie_lists_homepage_model.dart';
 import 'package:filmboxd/models/review_model.dart';
+import 'package:filmboxd/services/auth_service.dart';
 import 'package:filmboxd/widgets/list_post_widget.dart';
 import 'package:filmboxd/widgets/movie_poster_scroll_widget.dart';
 import 'package:filmboxd/widgets/review_post_widget.dart';
@@ -7,7 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -22,7 +23,7 @@ class _HomePageState extends State<HomePage>
   final List<Color> selectedTabColors = [
     Color(0xfF8DB2B2),
     Color(0xfFF3D72E),
-    Color(0xfffB85D48),
+    Color(0xfffb85d48),
   ];
 
   @override
@@ -47,10 +48,6 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-//sign user out method
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
 
   final ReviewPost sampleReview = ReviewPost(
   movieTitle: "Moana",

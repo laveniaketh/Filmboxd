@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MoviePosterGridView extends StatelessWidget {
   final int posterCount; // Number of placeholder posters to display
 
-  const MoviePosterGridView({this.posterCount = 8}); 
+  const MoviePosterGridView({super.key, this.posterCount = 8}); 
 
   @override
   Widget build(BuildContext context) {
