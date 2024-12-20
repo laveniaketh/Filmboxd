@@ -1,5 +1,7 @@
+import 'package:filmboxd/pages/movie_detail_page.dart';
 import 'package:flutter/material.dart';
 import '../services/omdb_service.dart';
+
 
 class MoviePosterScrollWidget extends StatefulWidget {
   final List<String> movieTitles; // Titles for fetching posters
@@ -15,20 +17,19 @@ class MoviePosterScrollWidget extends StatefulWidget {
 }
 
 class _MoviePosterScrollWidgetState extends State<MoviePosterScrollWidget> {
-  List<String> posters = [];
+  List<Map<String, String>> movieData = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchMoviePosters();
+    fetchMovieData();
   }
 
-  Future<void> fetchMoviePosters() async {
-    final fetchedPosters =
-        await OmdbService.fetchMoviePosters(widget.movieTitles);
+  Future<void> fetchMovieData() async {
+    final fetchedData = await OmdbService.fetchMovies(widget.movieTitles);
     setState(() {
-      posters = fetchedPosters;
+      movieData = fetchedData;
       isLoading = false;
     });
   }
@@ -40,30 +41,47 @@ class _MoviePosterScrollWidgetState extends State<MoviePosterScrollWidget> {
         : SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: List.generate(posters.length, (index) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 10.0),
-                  child: posters[index].isNotEmpty
-                      ? Container(
-                          width: 100,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            image: DecorationImage(
-                              image: NetworkImage(posters[index]),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        )
-                      : Container(
-                          width: 100,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300], // Placeholder color
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(Icons.image, size: 40),
+              children: List.generate(movieData.length, (index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => MovieDetailPage(
+                          posterUrl: movieData[index]['poster'] ?? '',
+                          title: movieData[index]['title'] ?? 'Unknown',
+                          year: movieData[index]['year'] ?? 'N/A',
+                          plot: movieData[index]['plot'] ?? 'Plot not available',
+                          director: movieData[index]['director'] ?? 'Director not available',
+                          runtime: movieData[index]['runtime'] ?? 'N/A',
                         ),
+                      ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: movieData[index]['poster']?.isNotEmpty == true
+                        ? Container(
+                            width: 100,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              image: DecorationImage(
+                                image:
+                                    NetworkImage(movieData[index]['poster']!),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          )
+                        : Container(
+                            width: 100,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(Icons.image, size: 40),
+                          ),
+                  ),
                 );
               }),
             ),

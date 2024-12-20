@@ -1,5 +1,4 @@
 import 'package:filmboxd/services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart'; // Import Flutter material package
 import 'package:filmboxd/components/my_textfield.dart'; // Import custom text field component
 import 'package:filmboxd/components/my_button.dart'; // Import custom button component
@@ -20,45 +19,45 @@ class _RegisterPageState extends State<RegisterPage> {
   final passWordController = TextEditingController();
   final confirmPassWordController = TextEditingController();
 
-  void signUserUp() async {
+  // void signUserUp() async {
 
-    //show loading circle
-    /*
-    showDialog(context: context, builder: (context) {
-      return Center(
-        child: CircularProgressIndicator(),
-      );
-    });
-    */
+  //   //show loading circle
+  //   /*
+  //   showDialog(context: context, builder: (context) {
+  //     return Center(
+  //       child: CircularProgressIndicator(),
+  //     );
+  //   });
+  //   */
 
-    //create user
-    try {
-      //check if password is confirmed
-      if (passWordController.text == confirmPassWordController.text) {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text,
-        password: passWordController.text,
-      );
+  //   //create user
+  //   try {
+  //     //check if password is confirmed
+  //     if (passWordController.text == confirmPassWordController.text) {
+  //       await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //       email: emailController.text,
+  //       password: passWordController.text,
+  //     );
 
-      }
+  //     }
       
-      // Navigator.pop(context);
-    } on FirebaseAuthException catch (e) { 
-      //wrong email
-      if(e.code== 'user-not-found') {
-        //show error
-      }
-      // wrong pw
-      else if (e.code== 'wrong-password') {
-        //show error
-      }
+  //     // Navigator.pop(context);
+  //   } on FirebaseAuthException catch (e) { 
+  //     //wrong email
+  //     if(e.code== 'user-not-found') {
+  //       //show error
+  //     }
+  //     // wrong pw
+  //     else if (e.code== 'wrong-password') {
+  //       //show error
+  //     }
 
       
-    }
+  //   }
     
-  }
+  // }
 
-  void signUserInWithGoogle() {}
+  // void signUserInWithGoogle() {}
 
   @override
   Widget build(BuildContext context) {

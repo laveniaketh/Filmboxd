@@ -7,7 +7,7 @@ class OmdbService {
   static const String _baseUrl = 'https://www.omdbapi.com/';
 
   static Future<Map<String, dynamic>?> fetchMovieDetails(String title) async {
-    final url = Uri.parse('$_baseUrl?apikey=$_apiKey&t=$title');
+    final url = Uri.parse('$_baseUrl?apikey=$_apiKey&t=$title&plot=full');
     try {
       final response = await http.get(url);
 
@@ -34,6 +34,27 @@ class OmdbService {
       }
     }
     return posters;
+  }
+
+  static Future<List<Map<String, String>>> fetchMovies(List<String> titles) async {
+    List<Map<String, String>> movies = [];
+    for (var title in titles) {
+      final url = Uri.parse('$_baseUrl?apikey=$_apiKey&t=$title&plot=full');
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        movies.add({
+          'title': data['Title'] ?? 'Unknown',
+          'year': data['Year'] ?? 'N/A',
+          'poster': data['Poster'] ?? '',
+          'plot': data['Plot'] ?? 'Plot not available',
+          'director': data['Director'] ?? 'Director not available',
+          'runtime': data['Runtime'] ?? 'N/A',
+        });
+      }
+    }
+    return movies;
   }
 
 }
