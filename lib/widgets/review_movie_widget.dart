@@ -8,13 +8,13 @@ class ReviewMovieWidget extends StatelessWidget {
   final double rating;
 
   const ReviewMovieWidget({
-    Key? key,
+    super.key,
     required this.username,
     required this.reviewText,
     required this.likes,
     required this.comments,
     required this.rating,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

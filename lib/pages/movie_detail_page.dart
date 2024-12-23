@@ -1,6 +1,7 @@
-import 'package:filmboxd/models/review_model.dart';
+import 'package:filmboxd/pages/add_review_page.dart';
 import 'package:filmboxd/widgets/review_movie_widget.dart';
 import 'package:filmboxd/widgets/review_post_widget.dart';
+import 'package:filmboxd/widgets/star_rating_widget.dart';
 import 'package:flutter/material.dart';
 
 class MovieDetailPage extends StatelessWidget {
@@ -11,7 +12,7 @@ class MovieDetailPage extends StatelessWidget {
   final String director;
   final String runtime;
 
-  MovieDetailPage({
+  const MovieDetailPage({
     required this.posterUrl,
     required this.title,
     required this.year,
@@ -21,6 +22,181 @@ class MovieDetailPage extends StatelessWidget {
     super.key,
   });
 
+  // void _showBottomModalSheet(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(50)),
+  //     ),
+  //     backgroundColor: Colors.white,
+  //     builder: (BuildContext context) {
+  //       return Padding(
+  //         padding: const EdgeInsets.all(16.0),
+  //         child: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 SizedBox(
+  //                   width: 100,
+  //                   child: Column(
+  //                     children: [
+  //                       ImageIcon(
+  //                         AssetImage('images/moviepage/watch.png'),
+  //                         size: 30,
+  //                         color: Color(0xfFD9D9D9),
+  //                       ),
+  //                       SizedBox(height: 10),
+  //                       Text(
+  //                         'Watch',
+  //                         style: TextStyle(
+  //                           fontFamily: 'Poppins',
+  //                           color: Color(0xfF1F1516),
+  //                           fontSize: 12,
+  //                           fontWeight: FontWeight.w400,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 SizedBox(
+  //                   width: 100,
+  //                   child: Column(
+  //                     children: [
+  //                       ImageIcon(
+  //                         AssetImage('images/moviepage/like.png'),
+  //                         size: 30,
+  //                         color: Color(0xfFD9D9D9),
+  //                       ),
+  //                       SizedBox(height: 10),
+  //                       Text(
+  //                         'Like',
+  //                         style: TextStyle(
+  //                           fontFamily: 'Poppins',
+  //                           color: Color(0xfF1F1516),
+  //                           fontSize: 12,
+  //                           fontWeight: FontWeight.w400,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //                 SizedBox(
+  //                   width: 100,
+  //                   child: Column(
+  //                     children: [
+  //                       ImageIcon(
+  //                         AssetImage('images/moviepage/watchlist.png'),
+  //                         size: 30,
+  //                         color: Color(0xfFD9D9D9),
+  //                       ),
+  //                       SizedBox(height: 10),
+  //                       Text(
+  //                         'Watchlist',
+  //                         style: TextStyle(
+  //                           fontFamily: 'Poppins',
+  //                           color: Color(0xfF1F1516),
+  //                           fontSize: 12,
+  //                           fontWeight: FontWeight.w400,
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 )
+  //               ],
+  //             ),
+  //             Divider(
+  //               color: Colors.grey[300],
+  //               thickness: 1,
+  //               indent: 20,
+  //               endIndent: 20,
+  //             ),
+  //             const SizedBox(height: 8),
+  //             const Text(
+  //               'Rate',
+  //               style: TextStyle(
+  //                 fontFamily: 'Poppins',
+  //                 fontSize: 16,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //             const SizedBox(height: 8),
+  //             Row(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: List.generate(
+  //                 5,
+  //                 (index) => ImageIcon(
+  //                   AssetImage('images/homepage/star.png'),
+  //                   size: 30,
+  //                   color: index < 5 ? Colors.yellow : Colors.grey,
+  //                 ),
+  //               ),
+  //             ),
+  //             const SizedBox(height: 8),
+  //             Divider(
+  //               color: Colors.grey[300],
+  //               thickness: 1,
+  //               indent: 20,
+  //               endIndent: 20,
+  //             ),
+  //             const ListTile(
+  //               contentPadding: EdgeInsets.symmetric(vertical: 0),
+  //               title: Center(
+  //                 child: Text(
+  //                   'Add Review',
+  //                   style: TextStyle(
+  //                     fontFamily: 'Poppins',
+  //                     fontSize: 14,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //             Divider(
+  //               color: Colors.grey[300],
+  //               thickness: 1,
+  //               indent: 20,
+  //               endIndent: 20,
+  //             ),
+  //             const ListTile(
+  //               contentPadding: EdgeInsets.symmetric(vertical: 0),
+  //               title: Center(
+  //                 child: Text(
+  //                   'Add to Lists',
+  //                   style: TextStyle(
+  //                     fontFamily: 'Poppins',
+  //                     fontSize: 14,
+  //                   ),
+  //                 ),
+  //               ),
+  //             ),
+  //             ElevatedButton(
+  //               style: ElevatedButton.styleFrom(
+  //                 backgroundColor: const Color(0xFF1F1516), // Black
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(10),
+  //                 ),
+  //                 padding: const EdgeInsets.symmetric(horizontal: 50),
+  //               ),
+  //               onPressed: () {
+  //                 Navigator.pop(context);
+  //               },
+  //               child: const Text(
+  //                 'Done',
+  //                 style: TextStyle(
+  //                   fontFamily: 'Poppins',
+  //                   fontSize: 16,
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Colors.white,
+  //                 ),
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
   void _showBottomModalSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -29,140 +205,216 @@ class MovieDetailPage extends StatelessWidget {
       ),
       backgroundColor: Colors.white,
       builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+        // State variables
+        bool isWatchSelected = false;
+        bool isLikeSelected = false;
+        bool isWatchlistSelected = false;
+        int starRating = 0;
+
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Column(
-                    children: const [
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundColor: Colors.grey,
+                  // Row for Watch, Like, Watchlist
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildIconButton(
+                        context,
+                        isWatchSelected ? 'Watched' : 'Watch',
+                        'images/moviepage/watch.png',
+                        isWatchSelected,
+                        () => setState(() {
+                          isWatchSelected = !isWatchSelected;
+                        }),
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Watch',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
+                      _buildIconButton(
+                        context,
+                        isLikeSelected ? 'Liked' : 'Like',
+                        'images/moviepage/like.png',
+                        isLikeSelected,
+                        () => setState(() {
+                          isLikeSelected = !isLikeSelected;
+                        }),
                       ),
-                    ],
-                  ),
-                  Column(
-                    children: const [
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundColor: Colors.grey,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Like',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: const [
-                      CircleAvatar(
-                        radius: 25,
-                        backgroundColor: Colors.grey,
-                      ),
-                      SizedBox(height: 8),
-                      Text(
+                      _buildIconButton(
+                        context,
                         'Watchlist',
+                        'images/moviepage/watchlist.png',
+                        isWatchlistSelected,
+                        () => setState(() {
+                          isWatchlistSelected = !isWatchlistSelected;
+                        }),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  // Star Rating Bar
+                  Divider(
+                    color: Colors.grey[300],
+                    thickness: 1,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Rate',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      5,
+                      (index) => GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starRating = index + 1;
+                          });
+                        },
+                        child: ImageIcon(
+                          AssetImage('images/homepage/star.png'),
+                          size: 30,
+                          color: index < starRating
+                              ? Color(0xffff3d72e)
+                              : Color(0XFFD9D9D9),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Divider(
+                    color: Colors.grey[300],
+                    thickness: 1,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
+                    GestureDetector(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                      builder: (context) => AddReviewPage(
+                        posterUrl: posterUrl, 
+                        title: title, 
+                        year: year, 
+                        director: director, 
+                        runtime: runtime,
+
+                      ),
+                      ),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                      title: Center(
+                        child: const Text(
+                          'Add Review',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.grey[300],
+                    thickness: 1,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
+                  const ListTile(
+                    contentPadding: EdgeInsets.symmetric(vertical: 0),
+                    title: Center(
+                      child: Text(
+                        'Add to Lists',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 14,
-                          color: Colors.black,
                         ),
                       ),
-                    ],
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.grey[300],
+                    thickness: 1,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1F1516), // Black
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 50),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text(
+                      'Done',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
-              const Divider(color: Colors.black54),
-              const SizedBox(height: 8),
-              const Text(
-                'Rate',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  5,
-                  (index) => ImageIcon(
-                    AssetImage('images/homepage/star.png'),
-                    size: 30,
-                    color: index < 5 ? Colors.yellow : Colors.grey,
-                  ),
-                ),
-              ),
-              const Divider(color: Colors.black54),
-              const SizedBox(height: 8),
-              const ListTile(
-                title: Text(
-                  'Add Review',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const Divider(color: Colors.black54),
-              const ListTile(
-                title: Text(
-                  'Add to Lists',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1F1516), // Black
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  'Done',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
+    );
+  }
+
+  // Helper function to build icon buttons
+  Widget _buildIconButton(
+    BuildContext context,
+    String label,
+    String iconPath,
+    bool isSelected,
+    VoidCallback onTap,
+  ) {
+    return SizedBox(
+      width: 100,
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: onTap,
+            child: ImageIcon(
+              AssetImage(iconPath),
+              size: 30,
+              color: isSelected
+                  ? (label == 'Watched'
+                      ? Color(0xfff8db2b2)
+                      : label == 'Liked'
+                          ? Color(0xfffb85d48)
+                          : Color(0xffff3d72e))
+                  : const Color(0xFFD9D9D9),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              color: Color(0xFF1F1516),
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
