@@ -337,7 +337,7 @@ class _HomePageState extends State<HomePage>
                   //   ),
                   // ),  
 
-                  ReviewPostWidget(review: sampleReview),
+                  // ReviewPostWidget(review: sampleReview),
                   
                 ],
               ),

@@ -29,19 +29,6 @@ class _ProfilePageState extends State<ProfilePage>
     Color(0xfffb85d48),
   ];
 
-  final ReviewPost sampleReview = ReviewPost(
-    movieTitle: "Moana",
-    yearOfRelease: "2024",
-    moviePoster: "", // Replace with actual image URL
-    textPost: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    username: "lavene",
-    profileImage:
-        "https://path_to_profile_image.com/profile.jpg", // Replace with actual profile image URL
-    numberOfLikes: 10,
-    numberOfComments: 3,
-    starRating: 3.0,
-  );
-
   @override
   void initState() {
     super.initState();
@@ -62,6 +49,7 @@ class _ProfilePageState extends State<ProfilePage>
     return DefaultTabController(
       length: 4,
       child: Scaffold(
+        backgroundColor: Colors.white, 
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Color(0xfF1F1516),
@@ -486,11 +474,81 @@ class _ProfilePageState extends State<ProfilePage>
               },
             ),
             Center(
-              child: ListView(
-                children: [
-                  //Review Tabs
-                  ReviewPostWidget(review: sampleReview),
-                ],
+              child: FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection(
+                        'Users') // Assuming there's a 'Users' collection
+                    .doc(AuthService()
+                        .getCurrentUser()
+                        ?.email) // Using current user's email as the document ID
+                    .get(),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // Show loading spinner while data is loading
+                  }
+
+                  if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                    return Text(
+                        'User not found.'); // Handle case where user document doesn't exist
+                  }
+
+                  final userData =
+                      userSnapshot.data!.data() as Map<String, dynamic>;
+                  final username = userData[
+                      'username']; // Assuming 'username' field exists in the 'Users' document
+
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('User Reviews') // Collection for reviews
+                        .where('username',
+                            isEqualTo: username) // Filter reviews by username
+                        .snapshots(),
+                    builder: (context, reviewsSnapshot) {
+                      if (reviewsSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return CircularProgressIndicator(); // Show loading spinner while reviews data is loading
+                      }
+
+                      if (!reviewsSnapshot.hasData ||
+                          reviewsSnapshot.data!.docs.isEmpty) {
+                        return Text(
+                            'No reviews found for this user.'); // Handle case where no reviews exist
+                      }
+
+                      final reviews =
+                          reviewsSnapshot.data!.docs; // List of reviews
+
+                      return ListView.builder(
+                        itemCount: reviews.length,
+                        itemBuilder: (context, index) {
+                          final reviewData =
+                              reviews[index].data() as Map<String, dynamic>;
+
+                          return Column(
+                            children: [
+                              ReviewPostWidget(
+                                movieTitle: reviewData['movieTitle'] ??
+                                    'Unknown Movie', // Provide a default value
+                                reviewText: reviewData['review'] ??
+                                    'No review text available.', // Provide a default value
+                                starRating: reviewData['starRating'] ??
+                                    0, // Provide a default value
+                                username: reviewData['username'] ??
+                                    'Anonymous', // Provide a default value
+                              ),
+                              Divider(
+                                color: Colors.grey[300],
+                                thickness: 1,
+                                indent: 20,
+                                endIndent: 20,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
               ),
             ),
             Center(

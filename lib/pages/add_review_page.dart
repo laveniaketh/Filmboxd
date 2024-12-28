@@ -1,5 +1,7 @@
+import 'package:filmboxd/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AddReviewPage extends StatefulWidget {
   final String posterUrl;
@@ -21,7 +23,25 @@ class AddReviewPage extends StatefulWidget {
   _AddReviewPageState createState() => _AddReviewPageState();
 }
 
+void addReviewToDatabase(String movieTitle, String username, DateTime date,
+    bool isLikedSelected, String review, int starRating, BuildContext context) {
+  FirebaseFirestore.instance.collection('User Reviews').add({
+    'movieTitle': movieTitle,
+    'username': username,
+    'date': date,
+    'isLiked': isLikedSelected,
+    'review': review,
+    'starRating': starRating,
+  }).then((value) {
+    print("Review Added");
+    Navigator.pop(context);
+  }).catchError((error) {
+    print("Failed to add review: $error");
+  });
+}
+
 class _AddReviewPageState extends State<AddReviewPage> {
+  final reviewController = TextEditingController();
   int starRating = 0;
   bool isLikeSelected = false;
 
@@ -59,9 +79,38 @@ class _AddReviewPageState extends State<AddReviewPage> {
               width: 24,
               height: 24,
             ),
-            onPressed: () {
-              // Add save functionality here
-              print('Selected rating: $starRating');
+            onPressed: () async {
+              final authService = AuthService();
+              final user = await authService.getCurrentUser();
+
+              if (user != null) {
+                final userDoc = await FirebaseFirestore.instance
+                    .collection('Users')
+                    .doc(user.email) // Using email as the document ID
+                    .get();
+
+                if (userDoc.exists) {
+                  final userData = userDoc.data() as Map<String, dynamic>;
+                  final username = userData['username'] ??
+                      'Anonymous'; // Default to 'Anonymous' if no username
+
+                  addReviewToDatabase(
+                    widget.title,
+                    username,
+                    DateTime.now(),
+                    isLikeSelected,
+                    reviewController.text,
+                    starRating,
+                    context,
+                  );
+                } else {
+                  // Handle case where the user document doesn't exist
+                  print('User document not found.');
+                }
+              } else {
+                // Handle case where the user is not logged in
+                print('No user is currently logged in.');
+              }
             },
           ),
         ],
@@ -186,68 +235,70 @@ class _AddReviewPageState extends State<AddReviewPage> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+              children: [
                 const Text(
                   'Rate',
                   style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   isLikeSelected ? 'Liked' : 'Like',
                   style: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                ],
-              ),
-              ),
-              const SizedBox(height: 8),
-              Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
                 Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: List.generate(
-                5,
-                (index) => GestureDetector(
-                  onTap: () {
-                  setState(() {
-                  starRating = index + 1;
-                  });
-                  },
-                  child: ImageIcon(
-                  const AssetImage('images/homepage/star.png'),
-                  size: 30,
-                  color: index < starRating
-                  ? const Color(0xffff3d72e)
-                  : const Color(0XFFD9D9D9),
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: List.generate(
+                    5,
+                    (index) => GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starRating = index + 1;
+                        });
+                      },
+                      child: ImageIcon(
+                        const AssetImage('images/homepage/star.png'),
+                        size: 30,
+                        color: index < starRating
+                            ? const Color(0xffff3d72e)
+                            : const Color(0XFFD9D9D9),
+                      ),
+                    ),
                   ),
-                ),
-                ),
                 ),
                 const SizedBox(width: 20),
                 GestureDetector(
-                onTap: () {
-                  setState(() {
-                  isLikeSelected = !isLikeSelected;
-                  });
-                },
-                child: ImageIcon(
-                  const AssetImage('images/moviepage/like.png'),
-                  size: 30,
-                  color: isLikeSelected ? const Color(0xfffb85d48) : const Color(0XFFD9D9D9),
+                  onTap: () {
+                    setState(() {
+                      isLikeSelected = !isLikeSelected;
+                    });
+                  },
+                  child: ImageIcon(
+                    const AssetImage('images/moviepage/like.png'),
+                    size: 30,
+                    color: isLikeSelected
+                        ? const Color(0xfffb85d48)
+                        : const Color(0XFFD9D9D9),
+                  ),
                 ),
-                ),
-                ],
-              ),
-              ),
+              ],
+            ),
+          ),
           // const SizedBox(height: 20),
           Divider(
             color: Colors.grey[300],
@@ -272,13 +323,14 @@ class _AddReviewPageState extends State<AddReviewPage> {
             ),
           ),
           // const SizedBox(height: 8),
-                GestureDetector(
-                onTap: () {
-                FocusScope.of(context).unfocus();
-                },
-                child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextField(
+          GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: TextField(
+                controller: reviewController,
                 maxLines: 15,
                 style: const TextStyle(
                   fontFamily: 'Poppins',
@@ -288,15 +340,15 @@ class _AddReviewPageState extends State<AddReviewPage> {
                 decoration: InputDecoration(
                   hintText: 'Write your review here...',
                   hintStyle: const TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  color: Colors.grey,
+                    fontFamily: 'Poppins',
+                    fontSize: 14,
+                    color: Colors.grey,
                   ),
                   border: InputBorder.none,
                 ),
-                ),
-                ),
-                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
