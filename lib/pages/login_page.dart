@@ -1,6 +1,5 @@
 import 'package:filmboxd/pages/forgot_pw_page.dart';
 import 'package:filmboxd/services/auth_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart'; // Import Flutter material package
 import 'package:filmboxd/components/my_textfield.dart'; // Import custom text field component
 import 'package:filmboxd/components/my_button.dart'; // Import custom button component

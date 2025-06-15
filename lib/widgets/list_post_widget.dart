@@ -1,3 +1,5 @@
+import 'package:filmboxd/models/movie_lists_profilepage_model.dart';
+import 'package:filmboxd/widgets/movie_poster_scroll_widget.dart';
 import 'package:flutter/material.dart';
 
 class ListPostWidget extends StatelessWidget {
@@ -23,7 +25,7 @@ class ListPostWidget extends StatelessWidget {
                   children: [
                     RichText(
                       text: TextSpan(
-                        text: "list title",
+                        text: "my comfort movies",
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 15,
@@ -35,7 +37,7 @@ class ListPostWidget extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          "username",
+                          "zeizei",
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
@@ -56,31 +58,36 @@ class ListPostWidget extends StatelessWidget {
                 SizedBox(height: 8),
 
                 // small horizontal scrollable movie posters
-                SizedBox(
-                  height: 50,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 10, // Number of posters
-                    itemBuilder: (context, index) {
-                      return Container(
-                        width: 40,
-                        margin: EdgeInsets.only(right: 3),
-                        decoration: BoxDecoration(
-                          // image: DecorationImage(
-                          //   image: AssetImage('images/homepage/poster1.jpg'),
-                          //   fit: BoxFit.cover,
-                          // ),
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      );
-                    },
-                  ),
+                MoviePosterScrollWidget(
+                  movieTitles: MovieListsHomePage.comfortMovies,
+                  posterWidth: 45,
+                  posterHeight: 65,
                 ),
+                // SizedBox(
+                //   height: 50,
+                //   child: ListView.builder(
+                //     scrollDirection: Axis.horizontal,
+                //     itemCount: 10, // Number of posters
+                //     itemBuilder: (context, index) {
+                //       return Container(
+                //         width: 40,
+                //         margin: EdgeInsets.only(right: 3),
+                //         decoration: BoxDecoration(
+                //           // image: DecorationImage(
+                //           //   image: AssetImage('images/homepage/poster1.jpg'),
+                //           //   fit: BoxFit.cover,
+                //           // ),
+                //           color: Colors.grey[300],
+                //           borderRadius: BorderRadius.circular(5),
+                //         ),
+                //       );
+                //     },
+                //   ),
+                // ),
 
                 // list desc
                 Text(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minimsdfdsfdfdsfdsfdsf sdwa sd dfs ",
+                  "list of my comfort movies to watchd during past time. I hope you enjoy it!. the list is based on my personal preference and mood.",
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -97,13 +104,13 @@ class ListPostWidget extends StatelessWidget {
                     Row(
                       children: [
                         ImageIcon(
-                          AssetImage('images/homepage/heart.png'),
+                          AssetImage('images/homepage/heart-outline.png'),
                           color: Color(0xfffb85d48),
                           size: 24,
                         ),
                         SizedBox(width: 4),
                         Text(
-                          '10',
+                          '2',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
@@ -118,7 +125,7 @@ class ListPostWidget extends StatelessWidget {
                         ),
                         SizedBox(width: 4),
                         Text(
-                          '4',
+                          '0',
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 12,
@@ -128,6 +135,12 @@ class ListPostWidget extends StatelessWidget {
                       ],
                     ),
                   ],
+                ),
+                Divider(
+                  color: Colors.grey[300],
+                  thickness: 1,
+                  indent: 10,
+                  endIndent: 10,
                 ),
               ],
             ),

@@ -1,12 +1,16 @@
+import 'package:filmboxd/models/movie_lists_profilepage_model.dart';
 import 'package:filmboxd/models/review_model.dart';
 import 'package:filmboxd/pages/edit_profile_page.dart';
 import 'package:filmboxd/services/auth_service.dart';
 import 'package:filmboxd/widgets/list_post_widget.dart';
 import 'package:filmboxd/widgets/movie_poster_grid_widget.dart';
+import 'package:filmboxd/widgets/movie_poster_scroll_widget.dart';
 import 'package:filmboxd/widgets/review_post_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:filmboxd/pages/auth_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -28,19 +32,6 @@ class _ProfilePageState extends State<ProfilePage>
     Color(0xfffb85d48),
   ];
 
-  final ReviewPost sampleReview = ReviewPost(
-    movieTitle: "Moana",
-    yearOfRelease: "2024",
-    moviePoster: "", // Replace with actual image URL
-    textPost: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    username: "lavene",
-    profileImage:
-        "https://path_to_profile_image.com/profile.jpg", // Replace with actual profile image URL
-    numberOfLikes: 10,
-    numberOfComments: 3,
-    starRating: 3.0,
-  );
-
   @override
   void initState() {
     super.initState();
@@ -61,36 +52,82 @@ class _ProfilePageState extends State<ProfilePage>
     return DefaultTabController(
       length: 4,
       child: Scaffold(
+        backgroundColor: Colors.white, 
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Color(0xfF1F1516),
-          title: GestureDetector(
-            onTap: () async {
-              // Show the dropdown menu when the title is tapped
-              await showMenu(
-                context: context,
-                position: RelativeRect.fromLTRB(100, 70, 100, 0),
-                items: [
-                  PopupMenuItem<int>(
-                    value: 0,
-                    child: Text('Logout'),
+          title: StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('Users')
+                .doc(AuthService().getCurrentUser()?.email)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final userData = snapshot.data!.data() as Map<String, dynamic>;
+                final name = userData['name'];
+
+                return GestureDetector(
+                  onTap: () async {
+                    // Show the dropdown menu when the title is tapped
+                    await showMenu(
+                      context: context,
+                      position: RelativeRect.fromLTRB(150, 70, 145, 0),
+                      items: [
+                        PopupMenuItem<int>(
+                          value: 0,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text('Log out',
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      color: Colors.white,
+                    ).then((value) {
+                      if (value == 0) {
+                        AuthService().signOut();
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => AuthPage()),
+                        );
+                      }
+                    });
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        name,
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      ImageIcon(
+                        AssetImage(
+                            'images/profilepage/dropdown-arrow-menu.png'),
+                        color: Color(0xfFFDEED4),
+                        size: 10.0,
+                      ),
+                    ],
                   ),
-                ],
-              ).then((value) {
-                if (value == 0) {
-                  AuthService().signOut();
-                }
-              });
+                );
+              } else if (snapshot.hasError) {
+                AuthService().signOut();
+                return Center(child: Text('Error occurred. Please try again.'));
+              }
+              return CircularProgressIndicator();
             },
-            child: Text(
-              'lavene',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
           ),
           bottom: TabBar(
             controller: _tabController,
@@ -166,282 +203,399 @@ class _ProfilePageState extends State<ProfilePage>
         body: TabBarView(
           controller: _tabController,
           children: [
-            ListView(
-              children: [
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Profile Icon
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor:
-                              Colors.grey.shade300, // Placeholder color
-                          child: Icon(
-                            Icons.person,
-                            size: 50,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        SizedBox(height: 10),
+            StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(AuthService().getCurrentUser()?.email)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final userData =
+                      snapshot.data!.data() as Map<String, dynamic>;
+                  final name = userData['name'];
+                  final username = userData['username'];
+                  final bio = userData['bio'];
 
-                        // Username
-                        Text(
-                          'laveniaketh',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            color: Color(0xfF1F1516),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        SizedBox(height: 16),
-
-                        // Following, Followers, and Likes
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 100,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '10',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: Color(0xfF1F1516),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Following',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: Color(0xfF1F1516),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              width: 100,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '10',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: Color(0xfF1F1516),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Followers',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: Color(0xfF1F1516),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              width: 100,
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '10',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: Color(0xfF1F1516),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Likes',
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: Color(0xfF1F1516),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-
-                        SizedBox(height: 10),
-
-                        // Edit Profile Button
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => EditProfilePage(),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xfF1F1516), // Button color
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                          ),
-                          child: Text(
-                            'Edit Profile',
-                            style: TextStyle(
-                              fontFamily: 'Poppins',
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 16),
-
-                        // Bio
-                        Text(
-                          'may we find solace in film.',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            color: Color(0xfF1F1516),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-
-                        SizedBox(height: 10),
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Text(
-                                'Favorites',
-                                style: TextStyle(
-                                  fontFamily: 'Poppins',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                  return ListView(
+                    children: [
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Profile Icon
+                              CircleAvatar(
+                                radius: 50,
+                                backgroundColor:
+                                    Colors.grey.shade300, // Placeholder color
+                                child: Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.grey.shade600,
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 5), //\
-                            // Top 4 Movie Posters
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(4, (index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 5),
-                                  child: Container(
-                                    width: 80,
-                                    height: 105,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Colors.grey[300], // Placeholder color
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    // child: Image.network(
-                                    //   'https://via.placeholder.com/100x150',
-                                    //   fit: BoxFit.cover,
-                                    // ),
-                                  ),
-                                );
-                              }),
-                            ),
-                          ],
-                        ),
+                              SizedBox(height: 10),
 
-                        SizedBox(height: 15),
-
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Text(
-                                'Recent Activity',
+                              // Username
+                              Text(
+                                username,
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xfF1F1516),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 5), //\
-                            // Top 4 Movie Posters
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(4, (index) {
-                                return Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 5),
-                                  child: Container(
-                                    width: 80,
-                                    height: 105,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Colors.grey[300], // Placeholder color
-                                      borderRadius: BorderRadius.circular(5),
+                              SizedBox(height: 16),
+
+                              // Following, Followers, and Likes
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 100,
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          '1',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Color(0xfF1F1516),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Following',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Color(0xfF1F1516),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    // child: Image.network(
-                                    //   'https://via.placeholder.com/100x150',
-                                    //   fit: BoxFit.cover,
-                                    // ),
                                   ),
-                                );
-                              }),
-                            ),
-                          ],
+                                  SizedBox(
+                                    width: 100,
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          '2',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Color(0xfF1F1516),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Followers',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Color(0xfF1F1516),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 100,
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          '4',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Color(0xfF1F1516),
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Likes',
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color: Color(0xfF1F1516),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+
+                              SizedBox(height: 10),
+
+                              // Edit Profile Button
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditProfilePage(),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Color(0xfF1F1516), // Button color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                ),
+                                child: Text(
+                                  'Edit Profile',
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 16),
+
+                              // Bio
+                              Text(
+                                bio,
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  color: Color(0xfF1F1516),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+
+                              SizedBox(height: 10),
+
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Text(
+                                      'Favorites',
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5), //\
+                                  // Top 4 Movie Posters
+                                   MoviePosterScrollWidget(
+                                    movieTitles: MovieListsHomePage.topFourMovies, 
+                                    posterWidth: 80, 
+                                    posterHeight: 105,),
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.center,
+                                  //   children: List.generate(4, (index) {
+                                  //     return Padding(
+                                  //       padding: const EdgeInsets.symmetric(
+                                  //           horizontal: 5),
+                                  //       child: Container(
+                                  //         width: 80,
+                                  //         height: 105,
+                                  //         decoration: BoxDecoration(
+                                  //           color: Colors
+                                  //               .grey[300], // Placeholder color
+                                  //           borderRadius:
+                                  //               BorderRadius.circular(5),
+                                  //         ),
+                                  //         // child: Image.network(
+                                  //         //   'https://via.placeholder.com/100x150',
+                                  //         //   fit: BoxFit.cover,
+                                  //         // ),
+                                  //       ),
+                                  //     );
+                                  //   }),
+                                  // ),
+                                ],
+                              ),
+
+                              SizedBox(height: 15),
+
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Text(
+                                      'Recent Activity',
+                                      style: TextStyle(
+                                        fontFamily: 'Poppins',
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5), //\
+                                  // Recent Activity Movie Posters
+                                  MoviePosterScrollWidget(
+                                    movieTitles: MovieListsHomePage.recentActivityMovies, 
+                                    posterWidth: 80, 
+                                    posterHeight: 105,),
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.center,
+                                  //   children: List.generate(4, (index) {
+                                  //     return Padding(
+                                  //       padding: const EdgeInsets.symmetric(
+                                  //           horizontal: 5),
+                                  //       child: Container(
+                                  //         width: 80,
+                                  //         height: 105,
+                                  //         decoration: BoxDecoration(
+                                  //           color: Colors
+                                  //               .grey[300], // Placeholder color
+                                  //           borderRadius:
+                                  //               BorderRadius.circular(5),
+                                  //         ),
+                                  //         // child: Image.network(
+                                  //         //   'https://via.placeholder.com/100x150',
+                                  //         //   fit: BoxFit.cover,
+                                  //         // ),
+                                  //       ),
+                                  //     );
+                                  //   }),
+                                  // ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+                      ),
+                    ],
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                return Center(child: CircularProgressIndicator());
+              },
             ),
             Center(
-                child: ListView(
-              children: [
-                //Review Tabs
-                ReviewPostWidget(review: sampleReview),
-              ],
-            )),
+              //REVIEWS TAB 
+              child: FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection(
+                        'Users') // Assuming there's a 'Users' collection
+                    .doc(AuthService()
+                        .getCurrentUser()
+                        ?.email) // Using current user's email as the document ID
+                    .get(),
+                builder: (context, userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(); // Show loading spinner while data is loading
+                  }
+
+                  if (!userSnapshot.hasData || !userSnapshot.data!.exists) {
+                    return Text(
+                        'User not found.'); // Handle case where user document doesn't exist
+                  }
+
+                  final userData =
+                      userSnapshot.data!.data() as Map<String, dynamic>;
+                  final username = userData[
+                      'username']; // Assuming 'username' field exists in the 'Users' document
+
+                  return StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('User Reviews') // Collection for reviews
+                        .where('username',
+                            isEqualTo: username) // Filter reviews by username
+                        .snapshots(),
+                    builder: (context, reviewsSnapshot) {
+                      if (reviewsSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return CircularProgressIndicator(); // Show loading spinner while reviews data is loading
+                      }
+
+                      if (!reviewsSnapshot.hasData ||
+                          reviewsSnapshot.data!.docs.isEmpty) {
+                        return Text(
+                            'No reviews found for this user.'); // Handle case where no reviews exist
+                      }
+
+                      final reviews =
+                          reviewsSnapshot.data!.docs; // List of reviews
+
+                      return ListView.builder(
+                        itemCount: reviews.length,
+                        itemBuilder: (context, index) {
+                          final reviewData =
+                              reviews[index].data() as Map<String, dynamic>;
+
+                          return Column(
+                            children: [
+                                ReviewPostWidget(
+                                movieTitle: reviewData['movieTitle'] ?? 'Unknown Movie',
+                                reviewText: reviewData['review'] ?? 'No review text available.',
+                                starRating: reviewData['starRating'] ?? 0,
+                                username: reviewData['username'] ?? 'Anonymous',
+                                isLikeSelected: reviewData['isLiked'] ?? false,
+                                datePosted: DateFormat('MMMM d, y').format((reviewData['date'] as Timestamp).toDate())
+                                ),
+                              Divider(
+                                color: Colors.grey[300],
+                                thickness: 1,
+                                indent: 20,
+                                endIndent: 20,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
             Center(
               child: Center(
                 child: Column(
                   children: [
                     Expanded(
-                      child: MoviePosterGridView(),
+                        child: FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance
+                          .collection('Users')
+                          .doc(AuthService().getCurrentUser()?.email)
+                          .get(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                          }
+                          if (!snapshot.hasData || !snapshot.data!.exists) {
+                          return Text('User not found.');
+                          }
+                          final userData = snapshot.data!.data() as Map<String, dynamic>;
+                          final username = userData['username'];
+                          return MoviePosterGridView(username: username);
+                        },
+                        ),
                     ),
                   ],
                 ),
               ),
             ),
             Center(
-                child: ListView(
-              children: [
-                // Lists
-                ListPostWidget(),
-              ],
-            )),
+              child: ListView(
+                children: [
+                  // Lists
+                  ListPostWidget(),
+                ],
+              ),
+            ),
           ],
         ),
       ),

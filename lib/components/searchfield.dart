@@ -1,7 +1,10 @@
+import 'package:filmboxd/widgets/movie_result_list.dart';
 import 'package:flutter/material.dart';
 
 class SearchField extends StatefulWidget {
-  const SearchField({super.key});
+  final Future<List<Map<String, String>>> Function(String) onSearch;
+
+  const SearchField({super.key, required this.onSearch});
 
   @override
   _SearchFieldState createState() => _SearchFieldState();
@@ -29,6 +32,14 @@ class _SearchFieldState extends State<SearchField> {
     super.dispose();
   }
 
+  void _handleSearch() async {
+    final query = _controller.text.trim();
+    if (query.isNotEmpty) {
+      final results = await widget.onSearch(query);
+      MovieResultList.updateResults(results);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,9 +47,10 @@ class _SearchFieldState extends State<SearchField> {
       child: TextField(
         controller: _controller,
         focusNode: _focusNode,
+        onSubmitted: (_) => _handleSearch(),
         decoration: InputDecoration(
           filled: true,
-          fillColor: Color(0XFFD9D9D9),
+          fillColor: const Color(0XFFD9D9D9),
           contentPadding: const EdgeInsets.all(15),
           hintText: 'Search',
           hintStyle: TextStyle(
@@ -55,25 +67,26 @@ class _SearchFieldState extends State<SearchField> {
           suffixIcon: _isFocused
               ? GestureDetector(
                   onTap: () {
-                    _controller.clear(); 
+                    _controller.clear();
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(12),
                     child: Image.asset('images/searchpage/clear.png',
                         width: 32, height: 32),
-                  )
-              )
+                  ),
+                )
               : null,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(40),
             borderSide: BorderSide.none,
           ),
         ),
-        style: TextStyle(
-            fontFamily: 'Poppins',
-            color: Color(0xfF1F1516),
-            fontSize: 13,
-            fontWeight: FontWeight.w400),
+        style: const TextStyle(
+          fontFamily: 'Poppins',
+          color: Color(0xFF1F1516),
+          fontSize: 13,
+          fontWeight: FontWeight.w400,
+        ),
       ),
     );
   }

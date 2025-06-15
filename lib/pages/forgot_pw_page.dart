@@ -1,8 +1,6 @@
 import 'package:filmboxd/components/my_button.dart';
 import 'package:filmboxd/components/my_textfield.dart';
-import 'package:filmboxd/services/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordPage extends StatefulWidget {

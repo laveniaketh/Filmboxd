@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
 
 class UserResultItemWidget extends StatelessWidget {
-  const UserResultItemWidget({super.key});
+  final String username;
+  final String name;
+  final String? profileImage;
+
+  const UserResultItemWidget({
+    super.key,
+    required this.username,
+    required this.name,
+    this.profileImage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +22,19 @@ class UserResultItemWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Circular Profile Image
           CircleAvatar(
             radius: 24,
             backgroundColor: Colors.grey[300],
-            // backgroundImage: AssetImage(profileImagePath),
+            backgroundImage: profileImage != null
+                ? NetworkImage(profileImage!)
+                : null,
           ),
           SizedBox(width: 10),
-          // User Name and Tag
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'janna',
+                name,
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.bold,
@@ -34,7 +43,7 @@ class UserResultItemWidget extends StatelessWidget {
                 ),
               ),
               Text(
-                'meeviester',
+                username,
                 style: TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 10,
@@ -44,8 +53,7 @@ class UserResultItemWidget extends StatelessWidget {
             ],
           ),
           Spacer(),
-          // Add Button (Plus Icon)
-            IconButton(
+          IconButton(
             icon: Image.asset(
               'images/searchpage/add.png',
               width: 24,

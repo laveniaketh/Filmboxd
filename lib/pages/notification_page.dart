@@ -68,7 +68,18 @@ class _NotificationPageState extends State<NotificationPage>
         ),
         body: ListView(
           children: [
-            NotificationItemWidget(),
+            NotificationItemWidget(
+              activityText: 'mazzy like your review on', 
+              movieName: 'Juno',
+              ),
+              NotificationItemWidget(
+              activityText: 'mazzy like your review on', 
+              movieName: 'Look Back',
+              ),
+              NotificationItemWidget(
+              activityText: 'mazzy like your review on', 
+              movieName: 'Challengers',
+              ),
           ],
         ),
       ),

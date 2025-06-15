@@ -1,8 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
-  
   // instance of auth
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -12,14 +12,13 @@ class AuthService {
     return _firebaseAuth.currentUser;
   }
 
-  // email sign in 
-  Future<UserCredential> signInWithEmailAndPassword(String email, password) async {
+  // email sign in
+  Future<UserCredential> signInWithEmailAndPassword(
+      String email, password) async {
     try {
-      // sign user in 
-      UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
-        email: email,
-        password: password
-      );
+      // sign user in
+      UserCredential userCredential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
@@ -27,13 +26,33 @@ class AuthService {
   }
 
   // email sign up
-  Future<UserCredential> signUpWithEmailAndPassword(String email, password) async {
+  Future<UserCredential> signUpWithEmailAndPassword(
+      String email, password) async {
     try {
       // create user
-      UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password
-      );
+      UserCredential userCredential = await _firebaseAuth
+          .createUserWithEmailAndPassword(email: email, password: password);
+
+      try {
+        String? userEmail = userCredential.user?.email;
+
+        if (userEmail != null) {
+          await FirebaseFirestore.instance
+              .collection('Users')
+              .doc(userEmail) 
+              .set({
+            'name': userEmail.split('@')[0],
+            'username': userEmail.split('@')[0],
+            'bio': "empty bio..."
+          });
+          print("Document successfully created in Firestore.");
+        } else {
+          print("Error: user email is null.");
+        }
+      } catch (e) {
+        print("Error creating Firestore document: $e");
+      }
+
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
@@ -47,28 +66,78 @@ class AuthService {
   }
 
   // google sign in
-  signInWithGoogle() async {
+  // signInWithGoogle() async {
+  //   //begin interactive sign in process
+  //   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-    //begin interactive sign in process
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  //   //user cancels google sign in popup screen
+  //   if (googleUser == null) {
+  //     return null;
+  //   }
 
-    //user cancels google sign in popup screen
-    if(googleUser == null) {
+  //   //obtain auth details from request
+  //   final GoogleSignInAuthentication googleAuth =
+  //       await googleUser.authentication;
+
+  //   //create a new credential
+  //   final credential = GoogleAuthProvider.credential(
+  //       accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
+
+  //   //finally sign in
+  //   return await _firebaseAuth.signInWithCredential(credential);
+  // }
+
+  // google sign in
+Future<UserCredential?> signInWithGoogle() async {
+  try {
+    // Begin interactive sign-in process
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+    // User cancels the Google sign-in popup screen
+    if (googleUser == null) {
       return null;
     }
 
-    //obtain auth details from request 
-    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    // Obtain authentication details from the request
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
-    //create a new credential
+    // Create a new credential
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken
-    );
+        accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
-    //finally sign in
-    return await _firebaseAuth.signInWithCredential(credential);
-  } 
+    // Sign in to Firebase with the Google credential
+    UserCredential userCredential =
+        await _firebaseAuth.signInWithCredential(credential);
+
+    // Check Firestore for an existing document; create one if it doesn't exist
+    final User? user = userCredential.user;
+
+    if (user != null) {
+      final userEmail = user.email ?? "";
+      final userDoc = FirebaseFirestore.instance.collection('Users').doc(userEmail);
+
+      // Check if the user document exists
+      final docSnapshot = await userDoc.get();
+      if (!docSnapshot.exists) {
+        await userDoc.set({
+          'name': user.displayName ?? userEmail.split('@')[0], // Default name if displayName is null
+          'username': userEmail.split('@')[0],
+          'email': userEmail,
+          'bio': "empty bio..."
+        });
+        print("New user document created in Firestore.");
+      } else {
+        print("User document already exists.");
+      }
+    }
+    return userCredential;
+  } catch (e) {
+    print("Error signing in with Google: $e");
+    return null;
+  }
+}
+
 
   //possible error messages
   String getErrorMessage(String code) {
@@ -87,8 +156,4 @@ class AuthService {
         return 'An error occurred.';
     }
   }
-
-
-
-  
 }

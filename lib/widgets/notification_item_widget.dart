@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class NotificationItemWidget extends StatelessWidget {
-  const NotificationItemWidget({super.key});
+  final String activityText;
+  final String movieName;
+
+  const NotificationItemWidget({
+    super.key,
+    required this.activityText,
+    required this.movieName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,34 +29,33 @@ class NotificationItemWidget extends StatelessWidget {
           SizedBox(width: 10),
           // User Name and Tag
           Text(
-                'deb liked your review of ', 
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 12,
-                  color: Colors.black,
-                ),
-              ),
-              Text(
-                'Juno',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: Colors.black,
-                ),
-              ),
-              
+            activityText,
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              fontSize: 12,
+              color: Colors.black,
+            ),
+          ),
+          Text(
+            ' $movieName',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+              color: Colors.black,
+            ),
+          ),
           Spacer(),
-            Text(
-                '1hr',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w400,
-                  fontSize: 10,
-                  color: Colors.black,
-                ),
-              ),
+          Text(
+            '1hr',
+            style: TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w400,
+              fontSize: 10,
+              color: Colors.black,
+            ),
+          ),
         ],
       ),
     );
