@@ -1,43 +1,57 @@
 import 'package:filmboxd/services/auth_service.dart';
+import 'package:filmboxd/services/omdb_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class AddReviewPage extends StatefulWidget {
+class EditReviewPage extends StatefulWidget {
   final String posterUrl;
-  final String title;
+  final String movieTitle;
   final String year;
-  final String director;
-  final String runtime;
+  final int starRating;
+  final String reviewText;
+  final bool isLikeSelected;
+  final String datePosted;
+  final String username;
 
-  const AddReviewPage({
+  const EditReviewPage({
     required this.posterUrl,
-    required this.title,
+    required this.movieTitle,
     required this.year,
-    required this.director,
-    required this.runtime,
+    required this.starRating,
+    required this.reviewText,
+    required this.isLikeSelected,
+    required this.datePosted,
+    required this.username,
     super.key,
   });
 
   @override
-  _AddReviewPageState createState() => _AddReviewPageState();
+  _EditReviewPageState createState() => _EditReviewPageState();
 }
 
-void addReviewToDatabase(String movieTitle, String username, DateTime date,
-    bool isLikedSelected, String review, int starRating, BuildContext context) {
-  FirebaseFirestore.instance.collection('User Reviews').add({
-    'movieTitle': movieTitle,
-    'username': username,
-    'date': date,
+
+void updateReviewToDatabase(String movieTitle, String username, String datePosted,
+  bool isLikedSelected, String review, int starRating, BuildContext context) {
+  FirebaseFirestore.instance
+    .collection('User Reviews')
+    .where('movieTitle', isEqualTo: movieTitle)
+    .where('username', isEqualTo: username)
+    .get()
+    .then((querySnapshot) {
+  if (querySnapshot.docs.isNotEmpty) {
+    querySnapshot.docs.first.reference.update({
     'isLiked': isLikedSelected,
     'review': review,
     'starRating': starRating,
-  }).then((value) {
+    }).then((value) {
+    print("Review Updated");
+
     ScaffoldMessenger.of(context).showSnackBar(
           
           SnackBar(
             content: Text(
-              'Added review successfully',
+              'Review updated successfully',
               style: TextStyle(
           fontFamily: 'Poppins',
           fontSize: 14,
@@ -48,16 +62,30 @@ void addReviewToDatabase(String movieTitle, String username, DateTime date,
             backgroundColor: Color(0xfF1F1516),
           ),
         );
+
     Navigator.pop(context);
+    Navigator.pop(context);
+    }).catchError((error) {
+    print("Failed to update review: $error");
+    });
+  } else {
+    print("No matching review found.");
+  }
   }).catchError((error) {
-    print("Failed to add review: $error");
+  print("Failed to find review: $error");
   });
 }
 
-class _AddReviewPageState extends State<AddReviewPage> {
+class _EditReviewPageState extends State<EditReviewPage> {
   final reviewController = TextEditingController();
   int starRating = 0;
-  bool isLikeSelected = false;
+  late bool isLikeSelected; // Declare as late to initialize in initState
+
+  @override
+  void initState() {
+    super.initState();
+    isLikeSelected = widget.isLikeSelected; // Initialize from widget
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -105,17 +133,21 @@ class _AddReviewPageState extends State<AddReviewPage> {
 
                 if (userDoc.exists) {
                   final userData = userDoc.data() as Map<String, dynamic>;
-                  final username = userData['username'] ??
-                      'Anonymous'; // Default to 'Anonymous' if no username
+                  final username =
+                    userData['username'] ?? 'Anonymous'; // Default to 'Anonymous' if no username
 
-                  addReviewToDatabase(
-                    widget.title,
-                    username,
-                    DateTime.now(),
-                    isLikeSelected,
-                    reviewController.text,
-                    starRating,
-                    context,
+                  if (starRating == 0) {
+                  starRating = widget.starRating;
+                  }
+
+                  updateReviewToDatabase(
+                  widget.movieTitle,
+                  username,
+                  widget.datePosted,
+                  isLikeSelected,
+                  reviewController.text,
+                  starRating,
+                  context,
                   );
                 } else {
                   // Handle case where the user document doesn't exist
@@ -142,8 +174,8 @@ class _AddReviewPageState extends State<AddReviewPage> {
                         borderRadius: BorderRadius.circular(5.0),
                         child: Image.network(
                           widget.posterUrl,
-                          width: 100,
-                          height: 170,
+                          width: 80,
+                          height: 120,
                           fit: BoxFit.cover,
                         ),
                       )
@@ -164,7 +196,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width - 200,
                         child: Text(
-                          widget.title,
+                          widget.movieTitle,
                           style: const TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 20,
@@ -175,28 +207,8 @@ class _AddReviewPageState extends State<AddReviewPage> {
                           softWrap: true,
                         ),
                       ),
-                      const SizedBox(height: 7),
                       Text(
-                        "${widget.year} | DIRECTED BY",
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 13,
-                          color: Color(0xFF1F1516),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.director,
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1F1516),
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        widget.runtime,
+                        widget.year,
                         style: const TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 13,
@@ -208,12 +220,6 @@ class _AddReviewPageState extends State<AddReviewPage> {
                 ),
               ],
             ),
-          ),
-          Divider(
-            color: Colors.grey[300],
-            thickness: 1,
-            indent: 20,
-            endIndent: 20,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -229,7 +235,7 @@ class _AddReviewPageState extends State<AddReviewPage> {
                   ),
                 ),
                 Text(
-                  '${DateFormat('MMMM d, yyyy').format(DateTime.now())}',
+                  widget.datePosted,
                   style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 13,
@@ -244,7 +250,6 @@ class _AddReviewPageState extends State<AddReviewPage> {
             indent: 20,
             endIndent: 20,
           ),
-          // const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -269,7 +274,6 @@ class _AddReviewPageState extends State<AddReviewPage> {
               ],
             ),
           ),
-          const SizedBox(height: 8),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -288,14 +292,13 @@ class _AddReviewPageState extends State<AddReviewPage> {
                       child: ImageIcon(
                         const AssetImage('images/homepage/star.png'),
                         size: 30,
-                        color: index < starRating
+                        color: index < (starRating > 0 ? starRating : widget.starRating)
                             ? const Color(0xffff3d72e)
                             : const Color(0XFFD9D9D9),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 20),
                 GestureDetector(
                   onTap: () {
                     setState(() {
@@ -306,14 +309,13 @@ class _AddReviewPageState extends State<AddReviewPage> {
                     const AssetImage('images/moviepage/like.png'),
                     size: 30,
                     color: isLikeSelected
-                        ? const Color(0xfffb85d48)
-                        : const Color(0XFFD9D9D9),
+                        ? const Color(0xffb85d48) // Selected color
+                        : const Color(0XFFD9D9D9), // Default color
                   ),
                 ),
               ],
             ),
           ),
-          // const SizedBox(height: 20),
           Divider(
             color: Colors.grey[300],
             thickness: 1,
@@ -322,44 +324,22 @@ class _AddReviewPageState extends State<AddReviewPage> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  'Review',
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // const SizedBox(height: 8),
-          GestureDetector(
-            onTap: () {
-              FocusScope.of(context).unfocus();
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: TextField(
-                controller: reviewController,
-                maxLines: 15,
-                style: const TextStyle(
+            child: TextField(
+              controller: reviewController..text = widget.reviewText,
+              maxLines: 15,
+              style: const TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                color: Color(0xFF1F1516),
+              ),
+              decoration: InputDecoration(
+                hintText: 'Write your review here...',
+                hintStyle: const TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 14,
-                  color: Color(0xFF1F1516),
+                  color: Colors.grey,
                 ),
-                decoration: InputDecoration(
-                  hintText: 'Write your review here...',
-                  hintStyle: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                  border: InputBorder.none,
-                ),
+                border: InputBorder.none,
               ),
             ),
           ),

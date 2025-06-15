@@ -5,7 +5,7 @@ class ReviewMovieWidget extends StatelessWidget {
   final String reviewText;
   final int likes;
   final int comments;
-  final double rating;
+  final int starRating;
 
   const ReviewMovieWidget({
     super.key,
@@ -13,7 +13,7 @@ class ReviewMovieWidget extends StatelessWidget {
     required this.reviewText,
     required this.likes,
     required this.comments,
-    required this.rating,
+    required this.starRating,
   });
 
   @override
@@ -32,7 +32,7 @@ class ReviewMovieWidget extends StatelessWidget {
           CircleAvatar(
             radius: 25,
             backgroundColor: Colors.grey[400], // Placeholder background
-            child: const Icon(Icons.person, color: Colors.white, size: 20),
+            child: const Icon(Icons.person, color: Colors.white, size: 30),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -58,7 +58,7 @@ class ReviewMovieWidget extends StatelessWidget {
                       (index) => ImageIcon(
                         AssetImage('images/homepage/star.png'),
                         size: 10,
-                        color: index < rating ? Colors.yellow : Colors.grey,
+                        color: index < starRating ? Colors.yellow : Colors.grey,
                       ),
                       ),
                     ),

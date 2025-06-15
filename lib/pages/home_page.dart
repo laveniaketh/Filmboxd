@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:filmboxd/models/movie_lists_homepage_model.dart';
 import 'package:filmboxd/models/review_model.dart';
 import 'package:filmboxd/services/auth_service.dart';
@@ -6,6 +7,7 @@ import 'package:filmboxd/widgets/movie_poster_scroll_widget.dart';
 import 'package:filmboxd/widgets/review_post_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -48,17 +50,16 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-
-  final ReviewPost sampleReview = ReviewPost(
-  movieTitle: "Moana",
-  yearOfRelease: "2024",
-  moviePoster: "https://path_to_example_movie_poster.com/poster.jpg", // Replace with actual image URL
-  textPost: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  username: "janna",
-  profileImage: "https://path_to_profile_image.com/profile.jpg", // Replace with actual profile image URL
-  numberOfLikes: 10,
-  numberOfComments: 3, starRating: 3.0,
-);
+//   final ReviewPost sampleReview = ReviewPost(
+//   movieTitle: "Moana",
+//   yearOfRelease: "2024",
+//   moviePoster: "https://path_to_example_movie_poster.com/poster.jpg", // Replace with actual image URL
+//   textPost: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+//   username: "janna",
+//   profileImage: "https://path_to_profile_image.com/profile.jpg", // Replace with actual profile image URL
+//   numberOfLikes: 10,
+//   numberOfComments: 3, starRating: 3.0,
+// );
 
   @override
   Widget build(BuildContext context) {
@@ -137,14 +138,12 @@ class _HomePageState extends State<HomePage>
                 EdgeInsets.symmetric(horizontal: -30, vertical: 10),
           ),
         ),
-        
         body: TabBarView(
           controller: _tabController,
           children: [
             Center(
                 child: Padding(
-              padding:
-                  const EdgeInsets.only( left: 10.0, right: 10.0),
+              padding: const EdgeInsets.only(left: 10.0, right: 10.0),
               child: ListView(
                 //Films Tab
 
@@ -335,22 +334,72 @@ class _HomePageState extends State<HomePage>
                   //       ),
                   //     ],
                   //   ),
-                  // ),  
+                  // ),
 
                   // ReviewPostWidget(review: sampleReview),
-                  
+                    StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                      .collection('User Reviews') // Collection for reviews
+                      .snapshots(),
+                    builder: (context, reviewsSnapshot) {
+                      if (reviewsSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return CircularProgressIndicator(); // Show loading spinner while reviews data is loading
+                      }
+
+                      if (!reviewsSnapshot.hasData ||
+                        reviewsSnapshot.data!.docs.isEmpty) {
+                      return Text(
+                        'No reviews found.'); // Handle case where no reviews exist
+                      }
+
+                      final reviews =
+                        reviewsSnapshot.data!.docs; // List of reviews
+
+                      return ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: reviews.length,
+                      itemBuilder: (context, index) {
+                        final reviewData =
+                          reviews[index].data() as Map<String, dynamic>;
+
+                        return Column(
+                        children: [
+                          ReviewPostWidget(
+                          movieTitle: reviewData['movieTitle'] ??
+                            'Unknown Movie',
+                          reviewText: reviewData['review'] ??
+                            'No review text available.',
+                          starRating: reviewData['starRating'] ?? 0,
+                          username: reviewData['username'] ?? 'Anonymous',
+                          isLikeSelected:
+                            reviewData['isLiked'] ?? false,
+                          datePosted: DateFormat('MMMM d, y').format(
+                            (reviewData['date'] as Timestamp).toDate()),
+                          ),
+                          Divider(
+                          color: Colors.grey[300],
+                          thickness: 1,
+                          indent: 20,
+                          endIndent: 20,
+                          ),
+                        ],
+                        );
+                      },
+                      );
+                    },
+                    ),
                 ],
               ),
             ),
-            Center(child: 
-            ListView(
+            Center(
+                child: ListView(
               // Lists Tab
               children: [
                 ListPostWidget(),
               ],
-
-            )
-            ),
+            )),
           ],
         ),
       ),
@@ -359,130 +408,142 @@ class _HomePageState extends State<HomePage>
 
   Column popularWithFriendsSection() {
     return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Popular with Friends',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Popular with Friends',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
 
-                    const SizedBox(height: 10),
-                    MoviePosterScrollWidget(movieTitles: MovieLists.popularWithFriends),
+        const SizedBox(height: 10),
+        MoviePosterScrollWidget(
+          movieTitles: MovieLists.popularWithFriends,
+          posterWidth: 100,
+          posterHeight: 150,
+        ),
 
-                    // Horizontal Scroll of Posters
-                    // SingleChildScrollView(
-                    //   scrollDirection: Axis.horizontal,
-                    //   child: Row(
-                    //     children: List.generate(10, (index) {
-                    //       return Padding(
-                    //         padding: const EdgeInsets.only(right: 10.0),
-                    //         child: Container(
-                    //           width: 100,
-                    //           height: 150,
-                    //           decoration: BoxDecoration(
-                    //             color: Colors.grey[300], // Placeholder color
-                    //             borderRadius: BorderRadius.circular(8),
-                    //           ),
-                    //           // child: Image.network(
-                    //           //   'https://via.placeholder.com/100x150',
-                    //           //   fit: BoxFit.cover,
-                    //           // ),
-                    //         ),
-                    //       );
-                    //     }),
-                    //   ),
-                    // ),
-                  ],
-                );
+        // Horizontal Scroll of Posters
+        // SingleChildScrollView(
+        //   scrollDirection: Axis.horizontal,
+        //   child: Row(
+        //     children: List.generate(10, (index) {
+        //       return Padding(
+        //         padding: const EdgeInsets.only(right: 10.0),
+        //         child: Container(
+        //           width: 100,
+        //           height: 150,
+        //           decoration: BoxDecoration(
+        //             color: Colors.grey[300], // Placeholder color
+        //             borderRadius: BorderRadius.circular(8),
+        //           ),
+        //           // child: Image.network(
+        //           //   'https://via.placeholder.com/100x150',
+        //           //   fit: BoxFit.cover,
+        //           // ),
+        //         ),
+        //       );
+        //     }),
+        //   ),
+        // ),
+      ],
+    );
   }
 
   Column newFromFriendsSection() {
     return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'New from friends',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'New from friends',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
 
-                    const SizedBox(height: 10),
-                    MoviePosterScrollWidget(movieTitles: MovieLists.newFromFriends),
+        const SizedBox(height: 10),
+        MoviePosterScrollWidget(
+          movieTitles: MovieLists.newFromFriends,
+          posterWidth: 100,
+          posterHeight: 150,
+        ),
 
-                    // Horizontal Scroll of Posters
-                    // SingleChildScrollView(
-                    //   scrollDirection: Axis.horizontal,
-                    //   child: Row(
-                    //     children: List.generate(10, (index) {
-                    //       return Padding(
-                    //         padding: const EdgeInsets.only(right: 10.0),
-                    //         child: Container(
-                    //           width: 100,
-                    //           height: 150,
-                    //           decoration: BoxDecoration(
-                    //             color: Colors.grey[300], // Placeholder color
-                    //             borderRadius: BorderRadius.circular(8),
-                    //           ),
-                    //           // child: Image.network(
-                    //           //   'https://via.placeholder.com/100x150',
-                    //           //   fit: BoxFit.cover,
-                    //           // ),
-                    //         ),
-                    //       );
-                    //     }),
-                    //   ),
-                    // ),
-                  ],
-                );
+        // Horizontal Scroll of Posters
+        // SingleChildScrollView(
+        //   scrollDirection: Axis.horizontal,
+        //   child: Row(
+        //     children: List.generate(10, (index) {
+        //       return Padding(
+        //         padding: const EdgeInsets.only(right: 10.0),
+        //         child: Container(
+        //           width: 100,
+        //           height: 150,
+        //           decoration: BoxDecoration(
+        //             color: Colors.grey[300], // Placeholder color
+        //             borderRadius: BorderRadius.circular(8),
+        //           ),
+        //           // child: Image.network(
+        //           //   'https://via.placeholder.com/100x150',
+        //           //   fit: BoxFit.cover,
+        //           // ),
+        //         ),
+        //       );
+        //     }),
+        //   ),
+        // ),
+      ],
+    );
   }
 
   Column popularThisWeekSection() {
     return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Popular this week',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Popular this week',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
 
-                    const SizedBox(height: 10),
-                    MoviePosterScrollWidget(movieTitles: MovieLists.popularThisWeek),
+        const SizedBox(height: 10),
+        MoviePosterScrollWidget(
+          movieTitles: MovieLists.popularThisWeek,
+          posterWidth: 100,
+          posterHeight: 150,
+        ),
 
-                    // Horizontal Scroll of Posters
-                    // SingleChildScrollView(
-                    //   scrollDirection: Axis.horizontal,
-                    //   child: Row(
-                    //     children: List.generate(10, (index) {
-                    //       return Padding(
-                    //         padding: const EdgeInsets.only(right: 10.0),
-                    //         child: Container(
-                    //           width: 100,
-                    //           height: 150,
-                    //           decoration: BoxDecoration(
-                    //             color: Colors.grey[300], // Placeholder color
-                    //             borderRadius: BorderRadius.circular(8),
-                    //           ),
-                    //           // child: Image.network(
-                    //           //   'https://via.placeholder.com/100x150',
-                    //           //   fit: BoxFit.cover,
-                    //           // ),
-                    //         ),
-                    //       );
-                    //     }),
-                    //   ),
-                    // ),
-                  ],
-                );
+        // Horizontal Scroll of Posters
+        // SingleChildScrollView(
+        //   scrollDirection: Axis.horizontal,
+        //   child: Row(
+        //     children: List.generate(10, (index) {
+        //       return Padding(
+        //         padding: const EdgeInsets.only(right: 10.0),
+        //         child: Container(
+        //           width: 100,
+        //           height: 150,
+        //           decoration: BoxDecoration(
+        //             color: Colors.grey[300], // Placeholder color
+        //             borderRadius: BorderRadius.circular(8),
+        //           ),
+        //           // child: Image.network(
+        //           //   'https://via.placeholder.com/100x150',
+        //           //   fit: BoxFit.cover,
+        //           // ),
+        //         ),
+        //       );
+        //     }),
+        //   ),
+        // ),
+      ],
+    );
   }
 }

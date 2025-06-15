@@ -1,13 +1,16 @@
+import 'package:filmboxd/models/movie_lists_profilepage_model.dart';
 import 'package:filmboxd/models/review_model.dart';
 import 'package:filmboxd/pages/edit_profile_page.dart';
 import 'package:filmboxd/services/auth_service.dart';
 import 'package:filmboxd/widgets/list_post_widget.dart';
 import 'package:filmboxd/widgets/movie_poster_grid_widget.dart';
+import 'package:filmboxd/widgets/movie_poster_scroll_widget.dart';
 import 'package:filmboxd/widgets/review_post_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:filmboxd/pages/auth_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -255,7 +258,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     child: Column(
                                       children: [
                                         Text(
-                                          '10',
+                                          '1',
                                           style: TextStyle(
                                             fontFamily: 'Poppins',
                                             color: Color(0xfF1F1516),
@@ -280,7 +283,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     child: Column(
                                       children: [
                                         Text(
-                                          '10',
+                                          '2',
                                           style: TextStyle(
                                             fontFamily: 'Poppins',
                                             color: Color(0xfF1F1516),
@@ -305,7 +308,7 @@ class _ProfilePageState extends State<ProfilePage>
                                     child: Column(
                                       children: [
                                         Text(
-                                          '10',
+                                          '4',
                                           style: TextStyle(
                                             fontFamily: 'Poppins',
                                             color: Color(0xfF1F1516),
@@ -391,29 +394,33 @@ class _ProfilePageState extends State<ProfilePage>
                                   ),
                                   const SizedBox(height: 5), //\
                                   // Top 4 Movie Posters
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: List.generate(4, (index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5),
-                                        child: Container(
-                                          width: 80,
-                                          height: 105,
-                                          decoration: BoxDecoration(
-                                            color: Colors
-                                                .grey[300], // Placeholder color
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          // child: Image.network(
-                                          //   'https://via.placeholder.com/100x150',
-                                          //   fit: BoxFit.cover,
-                                          // ),
-                                        ),
-                                      );
-                                    }),
-                                  ),
+                                   MoviePosterScrollWidget(
+                                    movieTitles: MovieListsHomePage.topFourMovies, 
+                                    posterWidth: 80, 
+                                    posterHeight: 105,),
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.center,
+                                  //   children: List.generate(4, (index) {
+                                  //     return Padding(
+                                  //       padding: const EdgeInsets.symmetric(
+                                  //           horizontal: 5),
+                                  //       child: Container(
+                                  //         width: 80,
+                                  //         height: 105,
+                                  //         decoration: BoxDecoration(
+                                  //           color: Colors
+                                  //               .grey[300], // Placeholder color
+                                  //           borderRadius:
+                                  //               BorderRadius.circular(5),
+                                  //         ),
+                                  //         // child: Image.network(
+                                  //         //   'https://via.placeholder.com/100x150',
+                                  //         //   fit: BoxFit.cover,
+                                  //         // ),
+                                  //       ),
+                                  //     );
+                                  //   }),
+                                  // ),
                                 ],
                               ),
 
@@ -435,30 +442,34 @@ class _ProfilePageState extends State<ProfilePage>
                                     ),
                                   ),
                                   const SizedBox(height: 5), //\
-                                  // Top 4 Movie Posters
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: List.generate(4, (index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5),
-                                        child: Container(
-                                          width: 80,
-                                          height: 105,
-                                          decoration: BoxDecoration(
-                                            color: Colors
-                                                .grey[300], // Placeholder color
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                          ),
-                                          // child: Image.network(
-                                          //   'https://via.placeholder.com/100x150',
-                                          //   fit: BoxFit.cover,
-                                          // ),
-                                        ),
-                                      );
-                                    }),
-                                  ),
+                                  // Recent Activity Movie Posters
+                                  MoviePosterScrollWidget(
+                                    movieTitles: MovieListsHomePage.recentActivityMovies, 
+                                    posterWidth: 80, 
+                                    posterHeight: 105,),
+                                  // Row(
+                                  //   mainAxisAlignment: MainAxisAlignment.center,
+                                  //   children: List.generate(4, (index) {
+                                  //     return Padding(
+                                  //       padding: const EdgeInsets.symmetric(
+                                  //           horizontal: 5),
+                                  //       child: Container(
+                                  //         width: 80,
+                                  //         height: 105,
+                                  //         decoration: BoxDecoration(
+                                  //           color: Colors
+                                  //               .grey[300], // Placeholder color
+                                  //           borderRadius:
+                                  //               BorderRadius.circular(5),
+                                  //         ),
+                                  //         // child: Image.network(
+                                  //         //   'https://via.placeholder.com/100x150',
+                                  //         //   fit: BoxFit.cover,
+                                  //         // ),
+                                  //       ),
+                                  //     );
+                                  //   }),
+                                  // ),
                                 ],
                               ),
                             ],
@@ -474,6 +485,7 @@ class _ProfilePageState extends State<ProfilePage>
               },
             ),
             Center(
+              //REVIEWS TAB 
               child: FutureBuilder<DocumentSnapshot>(
                 future: FirebaseFirestore.instance
                     .collection(
@@ -526,16 +538,14 @@ class _ProfilePageState extends State<ProfilePage>
 
                           return Column(
                             children: [
-                              ReviewPostWidget(
-                                movieTitle: reviewData['movieTitle'] ??
-                                    'Unknown Movie', // Provide a default value
-                                reviewText: reviewData['review'] ??
-                                    'No review text available.', // Provide a default value
-                                starRating: reviewData['starRating'] ??
-                                    0, // Provide a default value
-                                username: reviewData['username'] ??
-                                    'Anonymous', // Provide a default value
-                              ),
+                                ReviewPostWidget(
+                                movieTitle: reviewData['movieTitle'] ?? 'Unknown Movie',
+                                reviewText: reviewData['review'] ?? 'No review text available.',
+                                starRating: reviewData['starRating'] ?? 0,
+                                username: reviewData['username'] ?? 'Anonymous',
+                                isLikeSelected: reviewData['isLiked'] ?? false,
+                                datePosted: DateFormat('MMMM d, y').format((reviewData['date'] as Timestamp).toDate())
+                                ),
                               Divider(
                                 color: Colors.grey[300],
                                 thickness: 1,
@@ -556,7 +566,23 @@ class _ProfilePageState extends State<ProfilePage>
                 child: Column(
                   children: [
                     Expanded(
-                      child: MoviePosterGridView(),
+                        child: FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance
+                          .collection('Users')
+                          .doc(AuthService().getCurrentUser()?.email)
+                          .get(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                          }
+                          if (!snapshot.hasData || !snapshot.data!.exists) {
+                          return Text('User not found.');
+                          }
+                          final userData = snapshot.data!.data() as Map<String, dynamic>;
+                          final username = userData['username'];
+                          return MoviePosterGridView(username: username);
+                        },
+                        ),
                     ),
                   ],
                 ),

@@ -1,6 +1,6 @@
 import 'package:filmboxd/components/searchfield.dart';
-import 'package:filmboxd/widgets/list_post_widget.dart';
-import 'package:filmboxd/widgets/movie_result_item_widget.dart';
+import 'package:filmboxd/services/omdb_service.dart';
+import 'package:filmboxd/widgets/movie_result_list.dart';
 import 'package:filmboxd/widgets/user_result_item_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -54,6 +54,8 @@ class _SearchPageState extends State<SearchPage>
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: Color(0xfF1F1516),
@@ -132,26 +134,30 @@ class _SearchPageState extends State<SearchPage>
             Center(
               child: ListView(
                 children: [
-                  SearchField(),
-                  MovieResultItemWidget(),
+                  SearchField(
+                    onSearch: (query) async {
+                      final results = await OmdbService.fetchMovies([query]);
+                      return results;
+                    },
+                  ),
+                  MovieResultList(),
                 ],
               ),
             ),
             Center(
               child: ListView(
                 children: [
-                  SearchField(),
-                  UserResultItemWidget(),
-                  UserResultItemWidget(),
-                  UserResultItemWidget(),
+                  // SearchField(),
+                  // UserResultItemWidget(),
+
                 ],
               ),
             ),
             Center(
               child: ListView(
                 children: [
-                  SearchField(),
-                  ListPostWidget(),
+                  // SearchField(),
+                  // ListPostWidget(),
                 ],
               ),
             ),

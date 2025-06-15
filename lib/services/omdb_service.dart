@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class OmdbService {
-  static const String _apiKey = '6eeeb55e'; 
+  static final String _apiKey = dotenv.env['OMDB_API_KEY'] ?? '';
 
   static const String _baseUrl = 'https://www.omdbapi.com/';
 
@@ -36,7 +37,8 @@ class OmdbService {
     return posters;
   }
 
-  static Future<List<Map<String, String>>> fetchMovies(List<String> titles) async {
+  static Future<List<Map<String, String>>> fetchMovies(
+      List<String> titles) async {
     List<Map<String, String>> movies = [];
     for (var title in titles) {
       final url = Uri.parse('$_baseUrl?apikey=$_apiKey&t=$title&plot=full');
@@ -56,5 +58,4 @@ class OmdbService {
     }
     return movies;
   }
-
 }

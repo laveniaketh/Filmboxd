@@ -2,12 +2,15 @@ import 'package:filmboxd/pages/movie_detail_page.dart';
 import 'package:flutter/material.dart';
 import '../services/omdb_service.dart';
 
-
 class MoviePosterScrollWidget extends StatefulWidget {
-  final List<String> movieTitles; // Titles for fetching posters
+  final List<String> movieTitles;
+  final double posterWidth;
+  final double posterHeight;
 
   const MoviePosterScrollWidget({
     required this.movieTitles,
+    required  this.posterWidth,
+    required  this.posterHeight,
     super.key,
   });
 
@@ -61,8 +64,8 @@ class _MoviePosterScrollWidgetState extends State<MoviePosterScrollWidget> {
                     padding: const EdgeInsets.only(right: 10.0),
                     child: movieData[index]['poster']?.isNotEmpty == true
                         ? Container(
-                            width: 100,
-                            height: 150,
+                            width: widget.posterWidth,
+                            height: widget.posterHeight,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               image: DecorationImage(
@@ -73,8 +76,8 @@ class _MoviePosterScrollWidgetState extends State<MoviePosterScrollWidget> {
                             ),
                           )
                         : Container(
-                            width: 100,
-                            height: 150,
+                            width: widget.posterWidth,
+                            height: widget.posterHeight,
                             decoration: BoxDecoration(
                               color: Colors.grey[300],
                               borderRadius: BorderRadius.circular(8),
